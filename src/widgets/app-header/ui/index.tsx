@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { STORYBOOK_URL } from "@/src/config/storybook";
 import { cn } from "@/src/shared/lib/utils/cn";
 
 const navItems = [
   { href: "/", label: "Home" },
-  { href: "/components", label: "Components" },
+  { href: STORYBOOK_URL, label: "Storybook", external: true },
 ];
 
 export function AppHeader() {
@@ -23,20 +24,32 @@ export function AppHeader() {
           MAX UI
         </Link>
         <nav className="flex items-center gap-24">
-          {navItems.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className={cn(
-                "text-sm transition-colors",
-                pathname === href
-                  ? "font-medium text-neutral-900"
-                  : "text-neutral-500 hover:text-neutral-800"
-              )}
-            >
-              {label}
-            </Link>
-          ))}
+          {navItems.map(({ href, label, external }) =>
+            external ? (
+              <a
+                key={href}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-neutral-500 transition-colors hover:text-neutral-800"
+              >
+                {label}
+              </a>
+            ) : (
+              <Link
+                key={href}
+                href={href}
+                className={cn(
+                  "text-sm transition-colors",
+                  pathname === href
+                    ? "font-medium text-neutral-900"
+                    : "text-neutral-500 hover:text-neutral-800"
+                )}
+              >
+                {label}
+              </Link>
+            )
+          )}
           <a
             href="https://dev.max.ru/ui"
             target="_blank"
