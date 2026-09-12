@@ -1,5 +1,7 @@
 const LOCAL_STORYBOOK_URL = "http://localhost:6006";
-const APP_STORYBOOK_PATH = "/storybook";
+// Trailing slash is required: relative asset paths in Storybook index.html
+// resolve incorrectly from /storybook (no slash).
+const APP_STORYBOOK_PATH = "/storybook/";
 
 export const STORYBOOK_URL =
   process.env.NEXT_PUBLIC_STORYBOOK_URL ??

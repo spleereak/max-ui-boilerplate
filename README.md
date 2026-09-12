@@ -215,7 +215,7 @@ export const MyVariant: Story = {
 npm run build-storybook
 ```
 
-На production Storybook собирается в `public/storybook/` и доступен по **`/storybook`** на том же домене (например, `https://max-ui-boilerplate-five.vercel.app/storybook`). Локально ссылка ведёт на `http://localhost:6006`. Переопределить URL можно через `NEXT_PUBLIC_STORYBOOK_URL`.
+На production Storybook собирается в `public/storybook/` и доступен по **`/storybook/`** на том же домене (например, `https://max-ui-boilerplate-five.vercel.app/storybook/`). Локально ссылка ведёт на `http://localhost:6006`. Переопределить URL можно через `NEXT_PUBLIC_STORYBOOK_URL`.
 
 ## Добавление страницы
 
