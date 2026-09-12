@@ -3,12 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { STORYBOOK_URL } from "@/src/config/storybook";
+import { STORYBOOK_URL, isExternalStorybookUrl } from "@/src/config/storybook";
 import { cn } from "@/src/shared/lib/utils/cn";
 
 const navItems = [
   { href: "/", label: "Home" },
-  { href: STORYBOOK_URL, label: "Storybook", external: true },
+  {
+    href: STORYBOOK_URL,
+    label: "Storybook",
+    external: isExternalStorybookUrl(),
+  },
 ];
 
 export function AppHeader() {

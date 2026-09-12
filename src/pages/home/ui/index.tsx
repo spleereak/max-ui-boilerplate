@@ -2,7 +2,7 @@
 
 import { Button, Flex, Typography } from "@maxhub/max-ui";
 
-import { STORYBOOK_URL } from "@/src/config/storybook";
+import { STORYBOOK_URL, isExternalStorybookUrl } from "@/src/config/storybook";
 
 export default function HomePage() {
   return (
@@ -31,7 +31,12 @@ export default function HomePage() {
 
       <Flex gap={8} className="mt-40">
         <Button asChild size="medium" variant="primary">
-          <a href={STORYBOOK_URL} target="_blank" rel="noopener noreferrer">
+          <a
+            href={STORYBOOK_URL}
+            {...(isExternalStorybookUrl()
+              ? { target: "_blank", rel: "noopener noreferrer" }
+              : {})}
+          >
             Storybook
           </a>
         </Button>

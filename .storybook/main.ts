@@ -1,17 +1,25 @@
-import type { StorybookConfig } from '@storybook/nextjs-vite';
+import type { StorybookConfig } from "@storybook/nextjs-vite";
+
+const storybookBasePath = process.env.STORYBOOK_BASE_PATH;
 
 const config: StorybookConfig = {
   stories: ["../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
-  "addons": [
+  addons: [
     "@chromatic-com/storybook",
     "@storybook/addon-vitest",
     "@storybook/addon-a11y",
     "@storybook/addon-docs",
-    "@storybook/addon-mcp"
+    "@storybook/addon-mcp",
   ],
-  "framework": "@storybook/nextjs-vite",
-  "staticDirs": [
-    "../public"
-  ]
+  framework: "@storybook/nextjs-vite",
+  staticDirs: ["../public"],
+  async viteFinal(config, { configType }) {
+    if (configType === "PRODUCTION" && storybookBasePath) {
+      config.base = storybookBasePath;
+    }
+
+    return config;
+  },
 };
+
 export default config;
