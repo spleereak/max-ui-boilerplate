@@ -20,7 +20,6 @@
 # production
 /build
 /storybook-static
-/public/storybook
 
 # misc
 .DS_Store

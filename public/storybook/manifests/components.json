@@ -1,0 +1,277 @@
+{
+  "v": 0,
+  "components": {
+    "max-ui-avatar": {
+      "id": "max-ui-avatar",
+      "name": "Avatar",
+      "path": "./src/stories/max-ui/Avatar.stories.tsx",
+      "jsDocTags": {},
+      "error": {
+        "name": "Component file in node_modules",
+        "message": "File: /Users/splee/Documents/code/max-ui-boilerplate/node_modules/@maxhub/max-ui/dist/index.js\nError:\nComponent files in node_modules are not supported.\nThe distributed files in node_modules usually don't contain the necessary comments or types needed to analyze component information.\nConfigure TypeScript path aliases to map your package name to the source file instead.\n\nExample (tsconfig.json):\n{\n  \"compilerOptions\": {\n    \"baseUrl\": \".\",\n    \"paths\": {\n      \"@design-system/button\": [\"src/components/Button.tsx\"],\n      \"@design-system/*\": [\"src/components/*\"]\n    }\n  }\n}\n\nThen import using:\nimport { Button } from '@design-system/button'\n\nStorybook resolves tsconfig paths automatically.\nCode:\n/* File in node_modules */"
+      },
+      "stories": [
+        {
+          "id": "max-ui-avatar--image",
+          "name": "Image",
+          "snippet": "const Image = () => (\n  <Avatar.Container size={72} form=\"squircle\" onlineStatus>\n    <Avatar.Image\n      alt=\"User\"\n      src=\"https://sun9-21.userapi.com/1N-rJz6-7hoTDW7MhpWe19e_R_TdGV6Wu5ZC0A/67o6-apnAks.jpg\"\n    />\n  </Avatar.Container>\n);"
+        },
+        {
+          "id": "max-ui-avatar--text",
+          "name": "Text",
+          "snippet": "const Text = () => (\n  <Avatar.Container size={64} form=\"circle\">\n    <Avatar.Text gradient=\"blue\">AB</Avatar.Text>\n  </Avatar.Container>\n);"
+        },
+        {
+          "id": "max-ui-avatar--icon",
+          "name": "Icon",
+          "snippet": "const Icon = () => (\n  <Avatar.Container size={56} form=\"squircle\">\n    <Avatar.Icon>\n      <Icon16SearchOutline />\n    </Avatar.Icon>\n  </Avatar.Container>\n);"
+        },
+        {
+          "id": "max-ui-avatar--overlay-and-close",
+          "name": "Overlay + Close",
+          "snippet": "const OverlayAndClose = () => (\n  <Avatar.Container\n    size={64}\n    form=\"circle\"\n    overlay={<Avatar.Overlay />}\n    rightBottomCorner={<Avatar.CloseButton aria-label=\"Remove\" />}\n  >\n    <Avatar.Text gradient=\"purple\">MC</Avatar.Text>\n  </Avatar.Container>\n);"
+        }
+      ],
+      "import": "import { Avatar, Icon16SearchOutline } from '@maxhub/max-ui';"
+    },
+    "max-ui-button": {
+      "id": "max-ui-button",
+      "name": "Button",
+      "path": "./src/stories/max-ui/Button.stories.tsx",
+      "jsDocTags": {},
+      "error": {
+        "name": "Component file in node_modules",
+        "message": "File: /Users/splee/Documents/code/max-ui-boilerplate/node_modules/@maxhub/max-ui/dist/index.js\nError:\nComponent files in node_modules are not supported.\nThe distributed files in node_modules usually don't contain the necessary comments or types needed to analyze component information.\nConfigure TypeScript path aliases to map your package name to the source file instead.\n\nExample (tsconfig.json):\n{\n  \"compilerOptions\": {\n    \"baseUrl\": \".\",\n    \"paths\": {\n      \"@design-system/button\": [\"src/components/Button.tsx\"],\n      \"@design-system/*\": [\"src/components/*\"]\n    }\n  }\n}\n\nThen import using:\nimport { Button } from '@design-system/button'\n\nStorybook resolves tsconfig paths automatically.\nCode:\n/* File in node_modules */"
+      },
+      "stories": [
+        {
+          "id": "max-ui-button--sizes",
+          "name": "Sizes",
+          "snippet": "const Sizes = () => (\n  <Flex gap={8} wrap=\"wrap\">\n    {([\"xsmall\", \"small\", \"medium\", \"large\"] as const).map(size => (\n      <Button key={size} size={size} variant=\"primary\">\n        {size}\n      </Button>\n    ))}\n  </Flex>\n);"
+        },
+        {
+          "id": "max-ui-button--variants",
+          "name": "Variants",
+          "snippet": "const Variants = () => (\n  <Flex gap={8} wrap=\"wrap\">\n    {(\n      [\n        \"primary\",\n        \"secondary\",\n        \"ghost\",\n        \"primary-contrast\",\n        \"secondary-contrast\",\n        \"overlay\",\n        \"destructive\",\n      ] as const\n    ).map(variant => (\n      <Button key={variant} size=\"small\" variant={variant}>\n        {variant}\n      </Button>\n    ))}\n  </Flex>\n);"
+        },
+        {
+          "id": "max-ui-button--loading",
+          "name": "Loading",
+          "snippet": "const Loading = () => (\n  <Button\n    loading\n    size=\"medium\"\n    variant=\"primary\"\n    iconBefore={<Icon16SearchOutline />}\n  >\n    Loading\n  </Button>\n);"
+        }
+      ],
+      "import": "import { Button, Flex, Icon16SearchOutline } from '@maxhub/max-ui';"
+    },
+    "max-ui-cells": {
+      "id": "max-ui-cells",
+      "name": "Cells",
+      "path": "./src/stories/max-ui/Cells.stories.tsx",
+      "jsDocTags": {},
+      "error": {
+        "name": "No component found",
+        "message": "We could not detect the component from your story file. Specify meta.component.\n  12 | } from \"@maxhub/max-ui\";\n  13 |\n> 14 | const meta = {\n     | ^\n  15 |   title: \"MAX UI/Cells\",\n  16 |   parameters: {\n  17 |     layout: \"padded\",\n\n./src/stories/max-ui/Cells.stories.tsx:\nimport type { Meta, StoryObj } from \"@storybook/nextjs-vite\";\nimport {\n  Avatar,\n  CellAction,\n  CellHeader,\n  CellInput,\n  CellList,\n  CellSimple,\n  Counter,\n  Icon16Chevron,\n  Icon16SearchOutline,\n} from \"@maxhub/max-ui\";\n\nconst meta = {\n  title: \"MAX UI/Cells\",\n  parameters: {\n    layout: \"padded\",\n  },\n} satisfies Meta;\n\nexport default meta;\n\ntype Story = StoryObj<typeof meta>;\n\nexport const CellListExample: Story = {\n  name: \"CellList\",\n  render: () => (\n    <CellList\n      mode=\"island\"\n      filled\n      header={<CellHeader titleStyle=\"caps\">Список</CellHeader>}\n    >\n      <CellSimple\n        title=\"CellSimple\"\n        subtitle=\"С подзаголовком\"\n        showChevron\n        before={\n          <Avatar.Container size={40} form=\"circle\">\n            <Avatar.Text gradient=\"green\">UI</Avatar.Text>\n          </Avatar.Container>\n        }\n        after={<Counter value={3} variant=\"attention\" rounded />}\n      />\n      <CellAction mode=\"themed\" showChevron before={<Icon16Chevron />}>\n        CellAction themed\n      </CellAction>\n      <CellAction mode=\"destructive\">CellAction destructive</CellAction>\n    </CellList>\n  ),\n};\n\nexport const CellInputExample: Story = {\n  name: \"CellInput\",\n  render: () => (\n    <CellList mode=\"island\" filled>\n      <CellInput\n        height=\"normal\"\n        placeholder=\"CellInput\"\n        before={<Icon16SearchOutline />}\n      />\n    </CellList>\n  ),\n};\n"
+      },
+      "stories": [
+        {
+          "id": "max-ui-cells--cell-list-example",
+          "name": "CellList",
+          "snippet": "const CellListExample = () => (\n  <CellList\n    mode=\"island\"\n    filled\n    header={<CellHeader titleStyle=\"caps\">Список</CellHeader>}\n  >\n    <CellSimple\n      title=\"CellSimple\"\n      subtitle=\"С подзаголовком\"\n      showChevron\n      before={\n        <Avatar.Container size={40} form=\"circle\">\n          <Avatar.Text gradient=\"green\">UI</Avatar.Text>\n        </Avatar.Container>\n      }\n      after={<Counter value={3} variant=\"attention\" rounded />}\n    />\n    <CellAction mode=\"themed\" showChevron before={<Icon16Chevron />}>\n      CellAction themed\n    </CellAction>\n    <CellAction mode=\"destructive\">CellAction destructive</CellAction>\n  </CellList>\n);"
+        },
+        {
+          "id": "max-ui-cells--cell-input-example",
+          "name": "CellInput",
+          "snippet": "const CellInputExample = () => (\n  <CellList mode=\"island\" filled>\n    <CellInput\n      height=\"normal\"\n      placeholder=\"CellInput\"\n      before={<Icon16SearchOutline />}\n    />\n  </CellList>\n);"
+        }
+      ],
+      "import": "import {\n  Avatar,\n  CellAction,\n  CellHeader,\n  CellInput,\n  CellList,\n  CellSimple,\n  Counter,\n  Icon16Chevron,\n  Icon16SearchOutline,\n} from '@maxhub/max-ui';"
+    },
+    "max-ui-counter": {
+      "id": "max-ui-counter",
+      "name": "Counter",
+      "path": "./src/stories/max-ui/Counter.stories.tsx",
+      "jsDocTags": {},
+      "error": {
+        "name": "Component file in node_modules",
+        "message": "File: /Users/splee/Documents/code/max-ui-boilerplate/node_modules/@maxhub/max-ui/dist/index.js\nError:\nComponent files in node_modules are not supported.\nThe distributed files in node_modules usually don't contain the necessary comments or types needed to analyze component information.\nConfigure TypeScript path aliases to map your package name to the source file instead.\n\nExample (tsconfig.json):\n{\n  \"compilerOptions\": {\n    \"baseUrl\": \".\",\n    \"paths\": {\n      \"@design-system/button\": [\"src/components/Button.tsx\"],\n      \"@design-system/*\": [\"src/components/*\"]\n    }\n  }\n}\n\nThen import using:\nimport { Button } from '@design-system/button'\n\nStorybook resolves tsconfig paths automatically.\nCode:\n/* File in node_modules */"
+      },
+      "stories": [
+        {
+          "id": "max-ui-counter--variants",
+          "name": "Variants",
+          "snippet": "const Variants = () => (\n  <Flex gap={8} wrap=\"wrap\">\n    {(\n      [\"primary\", \"attention\", \"promo\", \"default\", \"mute\", \"menu\"] as const\n    ).map(variant => (\n      <Counter key={variant} value={7} variant={variant} rounded />\n    ))}\n  </Flex>\n);"
+        }
+      ],
+      "import": "import { Counter, Flex } from '@maxhub/max-ui';"
+    },
+    "max-ui-forms": {
+      "id": "max-ui-forms",
+      "name": "Forms",
+      "path": "./src/stories/max-ui/Forms.stories.tsx",
+      "jsDocTags": {},
+      "error": {
+        "name": "No component found",
+        "message": "We could not detect the component from your story file. Specify meta.component.\n  10 | } from \"@maxhub/max-ui\";\n  11 |\n> 12 | const meta = {\n     | ^\n  13 |   title: \"MAX UI/Forms\",\n  14 |   parameters: {\n  15 |     layout: \"padded\",\n\n./src/stories/max-ui/Forms.stories.tsx:\nimport { useState } from \"react\";\n\nimport type { Meta, StoryObj } from \"@storybook/nextjs-vite\";\nimport {\n  Flex,\n  Icon16SearchOutline,\n  Input,\n  Switch,\n  Textarea,\n} from \"@maxhub/max-ui\";\n\nconst meta = {\n  title: \"MAX UI/Forms\",\n  parameters: {\n    layout: \"padded\",\n  },\n} satisfies Meta;\n\nexport default meta;\n\ntype Story = StoryObj<typeof meta>;\n\nfunction InputDemo() {\n  const [value, setValue] = useState(\"MAX UI\");\n\n  return (\n    <Input\n      mode=\"contrast\"\n      value={value}\n      onChange={event => setValue(event.target.value)}\n      placeholder=\"Input\"\n      iconBefore={<Icon16SearchOutline />}\n      withClearButton\n      hint=\"Подсказка под полем\"\n    />\n  );\n}\n\nfunction InputModesDemo() {\n  const [value, setValue] = useState(\"MAX UI\");\n\n  return (\n    <Flex direction=\"column\" gap={12}>\n      <Input\n        mode=\"default\"\n        value={value}\n        onChange={event => setValue(event.target.value)}\n        placeholder=\"mode=default (на secondary фоне)\"\n      />\n      <Input\n        mode=\"contrast\"\n        value={value}\n        onChange={event => setValue(event.target.value)}\n        placeholder=\"mode=contrast\"\n        iconBefore={<Icon16SearchOutline />}\n        withClearButton\n      />\n    </Flex>\n  );\n}\n\nfunction SwitchDemo() {\n  const [on, setOn] = useState(true);\n\n  return (\n    <Switch checked={on} onChange={event => setOn(event.target.checked)} />\n  );\n}\n\nexport const InputStory: Story = {\n  name: \"Input\",\n  render: () => <InputDemo />,\n};\n\nexport const SwitchStory: Story = {\n  name: \"Switch\",\n  render: () => <SwitchDemo />,\n};\n\nexport const TextareaStory: Story = {\n  name: \"Textarea\",\n  render: () => (\n    <Flex direction=\"column\" gap={12}>\n      <Textarea\n        mode=\"primary\"\n        placeholder=\"mode=primary\"\n        defaultValue=\"Контрастное поле на secondary фоне\"\n        rows={3}\n      />\n      <Textarea\n        mode=\"secondary\"\n        placeholder=\"mode=secondary\"\n        defaultValue=\"Сливается с фоном — не использовать на secondary\"\n        rows={3}\n      />\n    </Flex>\n  ),\n};\n\nexport const InputModes: Story = {\n  name: \"Input modes\",\n  render: () => <InputModesDemo />,\n};\n"
+      },
+      "stories": [
+        {
+          "id": "max-ui-forms--input-story",
+          "name": "Input",
+          "snippet": "const InputStory = () => <InputDemo />;"
+        },
+        {
+          "id": "max-ui-forms--switch-story",
+          "name": "Switch",
+          "snippet": "const SwitchStory = () => <SwitchDemo />;"
+        },
+        {
+          "id": "max-ui-forms--textarea-story",
+          "name": "Textarea",
+          "snippet": "const TextareaStory = () => (\n  <Flex direction=\"column\" gap={12}>\n    <Textarea\n      mode=\"primary\"\n      placeholder=\"mode=primary\"\n      defaultValue=\"Контрастное поле на secondary фоне\"\n      rows={3}\n    />\n    <Textarea\n      mode=\"secondary\"\n      placeholder=\"mode=secondary\"\n      defaultValue=\"Сливается с фоном — не использовать на secondary\"\n      rows={3}\n    />\n  </Flex>\n);"
+        },
+        {
+          "id": "max-ui-forms--input-modes",
+          "name": "Input modes",
+          "snippet": "const InputModes = () => <InputModesDemo />;"
+        }
+      ],
+      "import": "import { Flex, Icon16SearchOutline, Input, Switch, Textarea } from '@maxhub/max-ui';"
+    },
+    "max-ui-helpers": {
+      "id": "max-ui-helpers",
+      "name": "Helpers",
+      "path": "./src/stories/max-ui/Helpers.stories.tsx",
+      "jsDocTags": {},
+      "error": {
+        "name": "No component found",
+        "message": "We could not detect the component from your story file. Specify meta.component.\n  2 | import { EllipsisText } from \"@maxhub/max-ui\";\n  3 |\n> 4 | const meta = {\n    | ^\n  5 |   title: \"MAX UI/Helpers\",\n  6 |   parameters: {\n  7 |     layout: \"padded\",\n\n./src/stories/max-ui/Helpers.stories.tsx:\nimport type { Meta, StoryObj } from \"@storybook/nextjs-vite\";\nimport { EllipsisText } from \"@maxhub/max-ui\";\n\nconst meta = {\n  title: \"MAX UI/Helpers\",\n  parameters: {\n    layout: \"padded\",\n  },\n} satisfies Meta;\n\nexport default meta;\n\ntype Story = StoryObj<typeof meta>;\n\nexport const EllipsisTextExample: Story = {\n  name: \"EllipsisText\",\n  render: () => (\n    <EllipsisText maxLines={2}>\n      EllipsisText обрезает длинный текст. Lorem ipsum dolor sit amet,\n      consectetur adipiscing elit, sed do eiusmod tempor incididunt.\n    </EllipsisText>\n  ),\n};\n"
+      },
+      "stories": [
+        {
+          "id": "max-ui-helpers--ellipsis-text-example",
+          "name": "EllipsisText",
+          "snippet": "const EllipsisTextExample = () => (\n  <EllipsisText maxLines={2}>\n    EllipsisText обрезает длинный текст. Lorem ipsum dolor sit amet,\n    consectetur adipiscing elit, sed do eiusmod tempor incididunt.\n  </EllipsisText>\n);"
+        }
+      ],
+      "import": "import { EllipsisText } from '@maxhub/max-ui';"
+    },
+    "max-ui-iconbutton": {
+      "id": "max-ui-iconbutton",
+      "name": "IconButton",
+      "path": "./src/stories/max-ui/IconButton.stories.tsx",
+      "jsDocTags": {},
+      "error": {
+        "name": "Component file in node_modules",
+        "message": "File: /Users/splee/Documents/code/max-ui-boilerplate/node_modules/@maxhub/max-ui/dist/index.js\nError:\nComponent files in node_modules are not supported.\nThe distributed files in node_modules usually don't contain the necessary comments or types needed to analyze component information.\nConfigure TypeScript path aliases to map your package name to the source file instead.\n\nExample (tsconfig.json):\n{\n  \"compilerOptions\": {\n    \"baseUrl\": \".\",\n    \"paths\": {\n      \"@design-system/button\": [\"src/components/Button.tsx\"],\n      \"@design-system/*\": [\"src/components/*\"]\n    }\n  }\n}\n\nThen import using:\nimport { Button } from '@design-system/button'\n\nStorybook resolves tsconfig paths automatically.\nCode:\n/* File in node_modules */"
+      },
+      "stories": [
+        {
+          "id": "max-ui-iconbutton--default",
+          "name": "Default",
+          "snippet": "const Default = () => (\n  <Flex gap={8} wrap=\"wrap\">\n    {([\"xsmall\", \"small\", \"medium\", \"large\"] as const).map(size => (\n      <IconButton key={size} size={size} variant=\"secondary\">\n        <Icon16SearchOutline />\n      </IconButton>\n    ))}\n  </Flex>\n);"
+        },
+        {
+          "id": "max-ui-iconbutton--loading",
+          "name": "Loading",
+          "snippet": "const Loading = () => (\n  <IconButton size=\"medium\" variant=\"primary\" loading>\n    <Icon20CloseFilled />\n  </IconButton>\n);"
+        }
+      ],
+      "import": "import { Flex, Icon16SearchOutline, Icon20CloseFilled, IconButton } from '@maxhub/max-ui';"
+    },
+    "max-ui-icons": {
+      "id": "max-ui-icons",
+      "name": "Icons",
+      "path": "./src/stories/max-ui/Icons.stories.tsx",
+      "jsDocTags": {},
+      "error": {
+        "name": "No component found",
+        "message": "We could not detect the component from your story file. Specify meta.component.\n   7 | } from \"@maxhub/max-ui\";\n   8 |\n>  9 | const meta = {\n     | ^\n  10 |   title: \"MAX UI/Icons\",\n  11 |   parameters: {\n  12 |     layout: \"padded\",\n\n./src/stories/max-ui/Icons.stories.tsx:\nimport type { Meta, StoryObj } from \"@storybook/nextjs-vite\";\nimport {\n  Flex,\n  Icon16Chevron,\n  Icon16SearchOutline,\n  Icon20CloseFilled,\n} from \"@maxhub/max-ui\";\n\nconst meta = {\n  title: \"MAX UI/Icons\",\n  parameters: {\n    layout: \"padded\",\n  },\n} satisfies Meta;\n\nexport default meta;\n\ntype Story = StoryObj<typeof meta>;\n\nexport const IconSet: Story = {\n  name: \"Icon set\",\n  render: () => (\n    <Flex gap={12} align=\"center\">\n      <Icon16Chevron />\n      <Icon16SearchOutline />\n      <Icon20CloseFilled />\n    </Flex>\n  ),\n};\n"
+      },
+      "stories": [
+        {
+          "id": "max-ui-icons--icon-set",
+          "name": "Icon set",
+          "snippet": "const IconSet = () => (\n  <Flex gap={12} align=\"center\">\n    <Icon16Chevron />\n    <Icon16SearchOutline />\n    <Icon20CloseFilled />\n  </Flex>\n);"
+        }
+      ],
+      "import": "import { Flex, Icon16Chevron, Icon16SearchOutline, Icon20CloseFilled } from '@maxhub/max-ui';"
+    },
+    "max-ui-layout": {
+      "id": "max-ui-layout",
+      "name": "Layout",
+      "path": "./src/stories/max-ui/Layout.stories.tsx",
+      "jsDocTags": {},
+      "error": {
+        "name": "No component found",
+        "message": "We could not detect the component from your story file. Specify meta.component.\n  2 | import { Container, Grid, Panel } from \"@maxhub/max-ui\";\n  3 |\n> 4 | const meta = {\n    | ^\n  5 |   title: \"MAX UI/Layout\",\n  6 |   parameters: {\n  7 |     layout: \"padded\",\n\n./src/stories/max-ui/Layout.stories.tsx:\nimport type { Meta, StoryObj } from \"@storybook/nextjs-vite\";\nimport { Container, Grid, Panel } from \"@maxhub/max-ui\";\n\nconst meta = {\n  title: \"MAX UI/Layout\",\n  parameters: {\n    layout: \"padded\",\n  },\n} satisfies Meta;\n\nexport default meta;\n\ntype Story = StoryObj<typeof meta>;\n\nexport const GridPanelContainer: Story = {\n  name: \"Grid · Panel · Container\",\n  render: () => (\n    <Panel mode=\"secondary\" className=\"rounded-8 p-12\">\n      <Grid cols={2} gap={8}>\n        <Panel mode=\"primary\" className=\"rounded-8 p-12\">\n          Grid 1\n        </Panel>\n        <Panel mode=\"primary\" className=\"rounded-8 p-12\">\n          Grid 2\n        </Panel>\n      </Grid>\n      <Container fullWidth className=\"mt-8 p-8\">\n        Container\n      </Container>\n    </Panel>\n  ),\n};\n"
+      },
+      "stories": [
+        {
+          "id": "max-ui-layout--grid-panel-container",
+          "name": "Grid · Panel · Container",
+          "snippet": "const GridPanelContainer = () => (\n  <Panel mode=\"secondary\" className=\"rounded-8 p-12\">\n    <Grid cols={2} gap={8}>\n      <Panel mode=\"primary\" className=\"rounded-8 p-12\">\n        Grid 1\n      </Panel>\n      <Panel mode=\"primary\" className=\"rounded-8 p-12\">\n        Grid 2\n      </Panel>\n    </Grid>\n    <Container fullWidth className=\"mt-8 p-8\">\n      Container\n    </Container>\n  </Panel>\n);"
+        }
+      ],
+      "import": "import { Container, Grid, Panel } from '@maxhub/max-ui';"
+    },
+    "max-ui-spinner": {
+      "id": "max-ui-spinner",
+      "name": "Spinner",
+      "path": "./src/stories/max-ui/Spinner.stories.tsx",
+      "jsDocTags": {},
+      "error": {
+        "name": "Component file in node_modules",
+        "message": "File: /Users/splee/Documents/code/max-ui-boilerplate/node_modules/@maxhub/max-ui/dist/index.js\nError:\nComponent files in node_modules are not supported.\nThe distributed files in node_modules usually don't contain the necessary comments or types needed to analyze component information.\nConfigure TypeScript path aliases to map your package name to the source file instead.\n\nExample (tsconfig.json):\n{\n  \"compilerOptions\": {\n    \"baseUrl\": \".\",\n    \"paths\": {\n      \"@design-system/button\": [\"src/components/Button.tsx\"],\n      \"@design-system/*\": [\"src/components/*\"]\n    }\n  }\n}\n\nThen import using:\nimport { Button } from '@design-system/button'\n\nStorybook resolves tsconfig paths automatically.\nCode:\n/* File in node_modules */"
+      },
+      "stories": [
+        {
+          "id": "max-ui-spinner--appearances",
+          "name": "Appearances",
+          "snippet": "const Appearances = () => (\n  <Flex gap={16} align=\"center\" wrap=\"wrap\">\n    <Spinner size={20} appearance=\"primary\" />\n    <Spinner size={24} appearance=\"themed\" />\n    <Spinner size={24} appearance=\"contrast\" />\n    <Spinner size={24} appearance=\"negative\" />\n  </Flex>\n);"
+        }
+      ],
+      "import": "import { Flex, Spinner } from '@maxhub/max-ui';"
+    },
+    "max-ui-typography": {
+      "id": "max-ui-typography",
+      "name": "Typography",
+      "path": "./src/stories/max-ui/Typography.stories.tsx",
+      "jsDocTags": {},
+      "error": {
+        "name": "Component file in node_modules",
+        "message": "File: /Users/splee/Documents/code/max-ui-boilerplate/node_modules/@maxhub/max-ui/dist/index.js\nError:\nComponent files in node_modules are not supported.\nThe distributed files in node_modules usually don't contain the necessary comments or types needed to analyze component information.\nConfigure TypeScript path aliases to map your package name to the source file instead.\n\nExample (tsconfig.json):\n{\n  \"compilerOptions\": {\n    \"baseUrl\": \".\",\n    \"paths\": {\n      \"@design-system/button\": [\"src/components/Button.tsx\"],\n      \"@design-system/*\": [\"src/components/*\"]\n    }\n  }\n}\n\nThen import using:\nimport { Button } from '@design-system/button'\n\nStorybook resolves tsconfig paths automatically.\nCode:\n/* File in node_modules */"
+      },
+      "stories": [
+        {
+          "id": "max-ui-typography--display",
+          "name": "Display",
+          "snippet": "const Display = () => <Typography.Display>Display</Typography.Display>;"
+        },
+        {
+          "id": "max-ui-typography--headline",
+          "name": "Headline",
+          "snippet": "const Headline = () => (\n  <Flex direction=\"column\" gap={8}>\n    <Typography.Headline variant=\"large-strong\">\n      Headline large-strong\n    </Typography.Headline>\n    <Typography.Headline variant=\"medium\">Headline medium</Typography.Headline>\n  </Flex>\n);"
+        },
+        {
+          "id": "max-ui-typography--title",
+          "name": "Title",
+          "snippet": "const Title = () => (\n  <Flex direction=\"column\" gap={8}>\n    <Typography.Title variant=\"large-strong\">Title large-strong</Typography.Title>\n    <Typography.Title variant=\"medium\">Title medium</Typography.Title>\n  </Flex>\n);"
+        },
+        {
+          "id": "max-ui-typography--body",
+          "name": "Body",
+          "snippet": "const Body = () => (\n  <Flex direction=\"column\" gap={8}>\n    <Typography.Body variant=\"large\">Body large</Typography.Body>\n    <Typography.Body variant=\"medium\">Body medium</Typography.Body>\n  </Flex>\n);"
+        },
+        {
+          "id": "max-ui-typography--label-text-action",
+          "name": "Label · Text · Action",
+          "snippet": "const LabelTextAction = () => (\n  <Flex direction=\"column\" gap={12}>\n    <Typography.Label variant=\"large\">Label large</Typography.Label>\n    <Typography.Text variant=\"body\" color=\"primary\">\n      Text body\n    </Typography.Text>\n    <Typography.Action variant=\"medium\">Action medium</Typography.Action>\n  </Flex>\n);"
+        }
+      ],
+      "import": "import { Flex, Typography } from '@maxhub/max-ui';"
+    }
+  },
+  "meta": {
+    "docgen": "react-docgen",
+    "durationMs": 31
+  }
+}

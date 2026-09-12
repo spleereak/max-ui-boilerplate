@@ -4,14 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run build-storybook:app && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "build-storybook:app": "rm -rf storybook-static public/storybook && STORYBOOK_BASE_PATH=/storybook/ storybook build && mv storybook-static public/storybook"
+    "serve-storybook": "npx serve storybook-static"
   },
   "dependencies": {
     "@maxhub/max-ui": "^0.4.0",

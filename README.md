@@ -30,7 +30,8 @@ npm run dev
 |---------|----------|
 | `npm run dev` | Dev-сервер Next.js |
 | `npm run storybook` | Storybook на [http://localhost:6006](http://localhost:6006) |
-| `npm run build-storybook` | Статическая сборка Storybook → `storybook-static/` |
+| `npm run build-storybook` | Статическая сборка Storybook → `storybook-static/` (для Vercel) |
+| `npm run serve-storybook` | Локальный просмотр собранного Storybook |
 | `npm run build` | Production-сборка Next.js |
 | `npm run start` | Запуск собранного приложения |
 | `npm run lint` | ESLint |
@@ -47,14 +48,18 @@ app/                          # Next.js App Router (тонкие обёртки)
   (main)/                     # Группа с общим layout (header)
     layout.tsx
     page.tsx                  # → src/pages/home
+  components/                 # Каталог компонентов MAX UI
+    layout.tsx
+    page.tsx                  # → src/pages/components
   pages/
     _document.js              # Заглушка для Pages Router (см. ниже)
 
 src/
   app/styles/globals.css      # Глобальные стили + Tailwind
-  stories/max-ui/             # Storybook stories для @maxhub/max-ui
+  stories/max-ui/             # Storybook stories (только dev)
   pages/                      # FSD: страницы (композиция экранов)
     home/
+    components/               # Каталог компонентов на проде
   widgets/                    # FSD: виджеты (header, footer, …)
   features/                   # FSD: фичи
   entities/                   # FSD: сущности
@@ -170,52 +175,25 @@ npx shadcn@latest add button
 
 Компоненты попадут в `src/shared/components/ui/`.
 
-## Storybook
+## Каталог компонентов
 
-Каталог компонентов MAX UI — отдельный [Storybook](https://storybook.js.org/) на `@storybook/nextjs-vite`:
+Маршрут **`/components`** — встроенный каталог MAX UI (sidebar, canvas, inspector с props/code):
+
+- поиск по компонентам;
+- переключение фона canvas;
+- вкладки Overview / Props / Code.
+
+Добавление story — в `src/pages/components/model/catalog.ts` и `demos.tsx`.
+
+## Storybook (dev)
+
+Для локальной разработки с controls, a11y и addons:
 
 ```bash
 npm run storybook
 ```
 
-Откроется [http://localhost:6006](http://localhost:6006). С главной страницы и из header есть ссылка **Storybook**.
-
-Конфигурация:
-
-- `.storybook/main.ts` — framework, addons, glob stories
-- `.storybook/preview.tsx` — декоратор `<MaxUI>` и глобальные стили
-
-Stories лежат в `src/stories/max-ui/` в формате CSF. Пример новой story:
-
-```tsx
-// src/stories/max-ui/Button.stories.tsx
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { Button } from "@maxhub/max-ui";
-
-const meta = {
-  title: "MAX UI/Button",
-  component: Button,
-} satisfies Meta<typeof Button>;
-
-export default meta;
-type Story = StoryObj<typeof meta>;
-
-export const MyVariant: Story = {
-  args: {
-    children: "Click",
-    variant: "primary",
-    size: "medium",
-  },
-};
-```
-
-Статическая сборка для деплоя:
-
-```bash
-npm run build-storybook
-```
-
-На production Storybook собирается в `public/storybook/` и доступен по **`/storybook/`** на том же домене (например, `https://max-ui-boilerplate-five.vercel.app/storybook/`). Локально ссылка ведёт на `http://localhost:6006`. Переопределить URL можно через `NEXT_PUBLIC_STORYBOOK_URL`.
+Откроется [http://localhost:6006](http://localhost:6006). Stories: `src/stories/max-ui/`.
 
 ## Добавление страницы
 
@@ -247,7 +225,7 @@ export { ProfilePage as default } from "@/src/pages/profile";
 | `entities` | Бизнес-сущности | `user`, `product` |
 | `features` | Пользовательские сценарии | `auth`, `add-to-cart` |
 | `widgets` | Комposite-блоки | `app-header` |
-| `pages` | Страницы приложения | `home` |
+| `pages` | Страницы приложения | `home`, `components` |
 
 Импорты только **снизу вверх** (pages → widgets → features → entities → shared).
 

@@ -1,0 +1,4000 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Components Manifest</title>
+  <style>
+      :root {
+          --bg: #0b0c10;
+          --panel: #121318;
+          --muted: #9aa0a6;
+          --fg: #e8eaed;
+          --ok: #22c55e;
+          --info: #1e88e5;
+          --err: #c62828;
+          --ok-bg: #0c1a13;
+          --info-bg: #0c1624;
+          --err-bg: #1a0e0e;
+          --chip: #1f2330;
+          --border: #2b2f3a;
+          --link: #8ab4f8;
+          --active-ring: 1px; /* 1px active ring for pills and toggles */
+      }
+
+      * {
+          box-sizing: border-box;
+      }
+
+      html,
+      body {
+          margin: 0;
+          background: var(--bg);
+          color: var(--fg);
+          font: 14px/1.5 system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Ubuntu,
+          Cantarell,
+          'Helvetica Neue',
+          Arial,
+          'Noto Sans';
+      }
+
+      .wrap {
+          max-width: 1100px;
+          margin: 0 auto;
+          padding: 16px 20px;
+      }
+
+      header {
+          position: sticky;
+          top: 0;
+          backdrop-filter: blur(6px);
+          background: color-mix(in srgb, var(--bg) 84%, transparent);
+          border-bottom: 1px solid var(--border);
+          z-index: 10;
+      }
+
+      h1 {
+          font-size: 20px;
+          margin: 0 0 6px;
+      }
+
+      .summary {
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+          align-items: center;
+      }
+
+      /* Top filter pills */
+      .filter-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 12px;
+          border: 1px solid var(--border);
+          border-radius: 999px;
+          background: var(--panel);
+          text-decoration: none;
+          cursor: pointer;
+          user-select: none;
+          color: var(--fg);
+      }
+
+      .filter-pill.ok {
+          color: #b9f6ca;
+          border-color: color-mix(in srgb, var(--ok) 55%, var(--border));
+          background: color-mix(in srgb, var(--ok) 18%, #000);
+      }
+
+      .filter-pill.info {
+          color: #b3d9ff;
+          border-color: color-mix(in srgb, var(--info) 55%, var(--border));
+          background: var(--info-bg);
+      }
+
+      .filter-pill.err {
+          color: #ff9aa0;
+          border-color: color-mix(in srgb, var(--err) 55%, var(--border));
+          background: var(--err-bg);
+      }
+
+      .filter-pill.all {
+          color: #d7dbe0;
+          border-color: var(--border);
+          background: var(--panel);
+      }
+
+      .filter-pill[aria-disabled='true'] {
+          cursor: default;
+          text-decoration: none;
+      }
+
+      .filter-pill:focus,
+      .filter-pill:active {
+          outline: none;
+          box-shadow: none;
+      }
+
+      /* Selected top pill ring via :target */
+      #filter-all:target ~ header .filter-pill[data-k='all'],
+      #filter-errors:target ~ header .filter-pill[data-k='errors'],
+      #filter-infos:target ~ header .filter-pill[data-k='infos'],
+      #filter-story-errors:target ~ header .filter-pill[data-k='story-errors'],
+      #filter-story-warnings:target ~ header .filter-pill[data-k='story-warnings'],
+      #filter-no-api:target ~ header .filter-pill[data-k='no-api'],
+      #filter-doc-errors:target ~ header .filter-pill[data-k='docs'],
+      #filter-docs:target ~ header .filter-pill[data-k='docs'] {
+          box-shadow: 0 0 0 var(--active-ring) currentColor;
+          border-color: currentColor;
+      }
+
+      /* Hidden targets for filtering */
+      #filter-all,
+      #filter-errors,
+      #filter-infos,
+      #filter-story-errors,
+      #filter-story-warnings,
+      #filter-no-api,
+      #filter-doc-errors,
+      #filter-docs {
+          display: none;
+      }
+
+      main {
+          padding: 36px 0 40px;
+      }
+
+      .grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 18px;
+      }
+
+      /* one card per row */
+
+      .card {
+          border: 1px solid var(--border);
+          background: var(--panel);
+          border-radius: 14px;
+          padding: 14px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          /* Keep a deep-linked card clear of the sticky header when scrolled into view */
+          scroll-margin-top: 110px;
+      }
+
+      /* Highlight the card deep-linked via components.html#<manifest-id> */
+      .card:target {
+          box-shadow: 0 0 0 2px var(--info);
+          border-color: var(--info);
+      }
+
+      .head {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+      }
+
+      .title {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+      }
+
+      .title h2 {
+          font-size: 16px;
+          margin: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+      }
+
+      .meta {
+          font-size: 12px;
+          color: var(--muted);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+      }
+
+      .kv {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+      }
+
+      .chip {
+          font-size: 12px;
+          padding: 4px 8px;
+          border-radius: 999px;
+          background: var(--chip);
+          border: 1px solid var(--border);
+      }
+
+      .hint {
+          color: var(--muted);
+          font-size: 12px;
+      }
+
+      .badges {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+      }
+
+      /* Per-card badges: labels become toggles when clickable */
+      .badge {
+          font-size: 12px;
+          padding: 3px 8px;
+          border-radius: 999px;
+          border: 1px solid var(--border);
+          background: var(--chip);
+          color: #d7dbe0;
+      }
+
+      .badge.ok {
+          color: #b9f6ca;
+          border-color: color-mix(in srgb, var(--ok) 55%, var(--border));
+      }
+
+      .badge.info {
+          color: #b3d9ff;
+          border-color: color-mix(in srgb, var(--info) 55%, var(--border));
+      }
+
+      .badge.err {
+          color: #ff9aa0;
+          border-color: color-mix(in srgb, var(--err) 55%, var(--border));
+      }
+
+      .snippet-warning {
+          margin-top: 8px;
+          padding: 8px 10px;
+          border-radius: 8px;
+          border: 1px solid color-mix(in srgb, var(--info) 45%, var(--border));
+          background: var(--info-bg);
+          color: #b3d9ff;
+          font-size: 12px;
+      }
+
+      .as-toggle {
+          cursor: pointer;
+      }
+
+      /* 1px ring on active toggle */
+      .tg-err:checked + label.as-toggle,
+      .tg-info:checked + label.as-toggle,
+      .tg-stories:checked + label.as-toggle,
+      .tg-docs:checked + label.as-toggle,
+      .tg-subcomponents:checked + label.as-toggle,
+      .tg-content:checked + label.as-toggle,
+      .tg-props:checked + label.as-toggle {
+          box-shadow: 0 0 0 var(--active-ring) currentColor;
+          border-color: currentColor;
+      }
+
+      /* Panels: hidden by default, shown when respective toggle checked */
+      .panels {
+          display: grid;
+          gap: 10px;
+      }
+
+      .panel {
+          display: none;
+      }
+
+      .tg-err:checked ~ .panels .panel-err {
+          display: grid;
+      }
+
+      .tg-info:checked ~ .panels .panel-info {
+          display: grid;
+          gap: 8px;
+      }
+
+      .tg-stories:checked ~ .panels .panel-stories {
+          display: grid;
+          gap: 8px;
+      }
+
+      .tg-docs:checked ~ .panels .panel-docs {
+          display: grid;
+          gap: 8px;
+      }
+
+      .tg-subcomponents:checked ~ .panels .panel-subcomponents {
+          display: grid;
+          gap: 8px;
+      }
+
+      .tg-content:checked ~ .panels .panel-content {
+          display: grid;
+          gap: 8px;
+      }
+
+      .tg-props:checked ~ .panels .panel-props {
+          display: grid;
+      }
+
+      /* Colored notes for API error + info */
+      .note {
+          padding: 12px;
+          border: 1px solid var(--border);
+          border-radius: 10px;
+      }
+
+      .note.err {
+          border-color: color-mix(in srgb, var(--err) 55%, var(--border));
+          background: var(--err-bg);
+          color: #ffd1d4;
+      }
+
+      .note.info {
+          border-color: color-mix(in srgb, var(--info) 55%, var(--border));
+          background: var(--info-bg);
+          color: #d6e8ff;
+      }
+
+      .note.ok {
+          border-color: color-mix(in srgb, var(--ok) 55%, var(--border));
+          background: var(--ok-bg);
+          color: var(--fg);
+      }
+
+      .note-title {
+          font-weight: 600;
+          margin-bottom: 6px;
+      }
+
+      .note-body {
+          white-space: normal;
+      }
+
+      /* Story error cards */
+      .ex {
+          padding: 10px;
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          background: #0f131b;
+      }
+
+      .ex.err {
+          border-color: color-mix(in srgb, var(--err) 55%, var(--border));
+      }
+
+      .row {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+      }
+
+      .status-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          display: inline-block;
+      }
+
+      .dot-ok {
+          background: var(--ok);
+      }
+
+      .dot-err {
+          background: var(--err);
+      }
+
+      .ex-name {
+          font-weight: 600;
+      }
+
+      /* Error groups (visible in errors filter) */
+      .error-groups {
+          display: none;
+          margin-bottom: 16px;
+      }
+
+      .group {
+          border: 1px solid var(--border);
+          background: var(--panel);
+          border-radius: 14px;
+          overflow: hidden;
+      }
+
+      .group + .group {
+          margin-top: 12px;
+      }
+
+      .group-header {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 12px 14px;
+          cursor: pointer;
+          border-bottom: 1px solid var(--border);
+      }
+
+      .group-header:hover {
+          background: #141722;
+      }
+
+      .group-title {
+          font-weight: 600;
+          flex: 1;
+      }
+
+      .group-count {
+          font-size: 12px;
+          color: var(--muted);
+      }
+
+      .group-cards {
+          display: none;
+          padding: 12px;
+      }
+
+      .group .card {
+          margin: 12px 0;
+      }
+
+      .group .card:first-child {
+          margin-top: 0;
+      }
+
+      .group .card:last-child {
+          margin-bottom: 0;
+      }
+
+      /* caret rotation */
+      .group-tg:checked + label .caret {
+          transform: rotate(90deg);
+      }
+
+      .caret {
+          transition: transform 0.15s ease;
+      }
+
+      /* toggle body */
+      .group-tg:checked ~ .group-cards {
+          display: block;
+      }
+
+      /* CSS-only filtering of cards via top pills */
+      #filter-errors:target ~ main .card:not(.has-error):not(.has-story-error) {
+          display: none;
+      }
+
+      #filter-infos:target ~ main .card:not(.has-info) {
+          display: none;
+      }
+
+      #filter-story-errors:target ~ main .card:not(.has-story-error) {
+          display: none;
+      }
+
+      #filter-story-warnings:target ~ main .card:not(.has-story-warning) {
+          display: none;
+      }
+
+      #filter-no-api:target ~ main .card:not(.missing-api) {
+          display: none;
+      }
+
+      #filter-doc-errors:target ~ main .card:not(.has-doc-error) {
+          display: none;
+      }
+
+      #filter-docs:target ~ main .card:has(> .tg-docs),
+      #filter-docs:target ~ main .card.is-doc {
+          display: block;
+      }
+
+      #filter-docs:target ~ main .card:not(:has(> .tg-docs)):not(.is-doc) {
+          display: none;
+      }
+
+      #filter-all:target ~ main .card {
+          display: block;
+      }
+
+      /* In errors view, hide standalone component-error cards in the regular grid (they will appear in groups) */
+      #filter-errors:target ~ main .grid .card.has-error {
+          display: none;
+      }
+
+      /* Show grouped section only in errors view */
+      #filter-errors:target ~ main .error-groups {
+          display: block;
+      }
+
+      /* Section titles */
+      .section-title {
+          font-size: 16px;
+          font-weight: 600;
+          color: var(--muted);
+          margin: 24px 0 12px;
+          padding-bottom: 8px;
+          border-bottom: 1px solid var(--border);
+      }
+      .section-title:first-child {
+          margin-top: 0;
+      }
+
+      /* When a toggle is checked, show the corresponding panel */
+      .card > .tg-err:checked ~ .panels .panel-err {
+          display: grid;
+      }
+      
+      .card > .tg-info:checked ~ .panels .panel-info {
+          display: grid;
+      }
+      
+      .card > .tg-stories:checked ~ .panels .panel-stories {
+          display: grid;
+      }
+
+      .card > .tg-docs:checked ~ .panels .panel-docs {
+          display: grid;
+      }
+
+      .card > .tg-subcomponents:checked ~ .panels .panel-subcomponents {
+          display: grid;
+      }
+
+      .card > .tg-content:checked ~ .panels .panel-content {
+          display: grid;
+      }
+
+      /* Add vertical spacing around panels only when any panel is visible */
+      .card > .tg-err:checked ~ .panels,
+      .card > .tg-info:checked ~ .panels,
+      .card > .tg-stories:checked ~ .panels,
+      .card > .tg-docs:checked ~ .panels,
+      .card > .tg-subcomponents:checked ~ .panels,
+      .card > .tg-content:checked ~ .panels,
+      .card > .tg-props:checked ~ .panels {
+          margin: 10px 0;
+      }
+
+      /* Optional: a subtle 1px ring on the active badge, using :has() if available */
+      @supports selector(.card:has(.tg-err:checked)) {
+          .card:has(.tg-err:checked) label[for$='-err'],
+          .card:has(.tg-info:checked) label[for$='-info'],
+          .card:has(.tg-stories:checked) label[for$='-stories'],
+          .card:has(.tg-docs:checked) label[for$='-docs'],
+          .card:has(.tg-subcomponents:checked) label[for$='-subcomponents'],
+          .card:has(.tg-content:checked) label[for$='-content'],
+          .card:has(.tg-props:checked) label[for$='-props'] {
+              box-shadow: 0 0 0 1px currentColor;
+              border-color: currentColor;
+          }
+      }
+
+      /* Wrap long lines in code blocks at ~120 characters */
+      pre, code {
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      }
+      pre {
+          white-space: pre-wrap;
+          overflow-wrap: anywhere;
+          word-break: break-word;
+          overflow-x: auto; /* fallback for extremely long tokens */
+          margin: 8px 0 0;
+      }
+      pre > code {
+          display: block;
+          white-space: inherit;
+          overflow-wrap: inherit;
+          word-break: inherit;
+          inline-size: min(100%, 120ch);
+      }
+
+      /* MDX content container for docs */
+      .mdx-content {
+          background: #0f131b;
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          padding: 12px;
+          max-height: 400px;
+          overflow-y: auto;
+          margin-top: 8px;
+      }
+  </style>
+</head>
+<body>
+<!-- Hidden targets for the top-level filters -->
+<span id="filter-all"></span>
+<span id="filter-errors"></span>
+<span id="filter-infos"></span>
+<span id="filter-story-errors"></span>
+<span id="filter-story-warnings"></span>
+<span id="filter-no-api"></span>
+<span id="filter-doc-errors"></span>
+<span id="filter-docs"></span>
+<header>
+  <div class="wrap">
+    <h1>Manifest Debugger</h1>
+    <div class="summary"><a class="filter-pill all" data-k="all" href="#filter-all">All</a><a class="filter-pill err" data-k="errors" href="#filter-errors">11/11 API errors</a><a class="filter-pill info" data-k="infos" href="#filter-infos">11/11 infos</a><span class="filter-pill ok" aria-disabled="true">25 stories ok</span></div>
+  </div>
+</header>
+<main>
+  <div class="wrap">
+    <div class="note info" style="margin-bottom: 16px;">
+            <strong>Tip:</strong> You are using <code>react-docgen</code> (the default). Generation took <strong>0.0s</strong>. For higher quality prop types, consider switching to <code>react-docgen-typescript</code> in your <code>main.ts</code>:
+            <pre><code>typescript: {
+  reactDocgen: 'react-docgen-typescript',
+}</code></pre>
+            Note: <code>react-docgen-typescript</code> can be slower. If performance is acceptable for your project, it generally produces better results.
+            <a href="https://storybook.js.org/docs/api/main-config/main-config-typescript#reactdocgen" target="_blank">Learn more</a>
+          </div>
+    <h2 class="section-title">Components</h2>
+    <div class="grid" role="list">
+      
+<article
+  id="max-ui-avatar"
+  class="card 
+  has-error
+  has-info
+  no-story-error
+  no-story-warning
+  
+  no-doc-error"
+  role="listitem"
+  aria-label="Avatar">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> Avatar</h2>
+      <div class="badges">
+        <label for="c-0-max-ui-avatar-err" class="badge err as-toggle">API error</label>
+        <label for="c-0-max-ui-avatar-info" class="badge info as-toggle">1 info</label>
+        <label for="c-0-max-ui-avatar-stories" class="badge ok as-toggle">4 stories</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/max-ui/Avatar.stories.tsx">max-ui-avatar · ./src/stories/max-ui/Avatar.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-0-max-ui-avatar-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-0-max-ui-avatar-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-0-max-ui-avatar-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">API error</div>
+      <div class="note-body"><pre><code>File: /Users/splee/Documents/code/max-ui-boilerplate/node_modules/@maxhub/max-ui/dist/index.js
+Error:
+Component files in node_modules are not supported.
+The distributed files in node_modules usually don&#39;t contain the necessary comments or types needed to analyze component information.
+Configure TypeScript path aliases to map your package name to the source file instead.
+
+Example (tsconfig.json):
+{
+  &quot;compilerOptions&quot;: {
+    &quot;baseUrl&quot;: &quot;.&quot;,
+    &quot;paths&quot;: {
+      &quot;@design-system/button&quot;: [&quot;src/components/Button.tsx&quot;],
+      &quot;@design-system/*&quot;: [&quot;src/components/*&quot;]
+    }
+  }
+}
+
+Then import using:
+import { Button } from &#39;@design-system/button&#39;
+
+Storybook resolves tsconfig paths automatically.
+Code:
+/* File in node_modules */</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Avatar, Icon16SearchOutline } from '@maxhub/max-ui';</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Image</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Image = () =&gt; (
+  &lt;Avatar.Container size={72} form=&quot;squircle&quot; onlineStatus&gt;
+    &lt;Avatar.Image
+      alt=&quot;User&quot;
+      src=&quot;https://sun9-21.userapi.com/1N-rJz6-7hoTDW7MhpWe19e_R_TdGV6Wu5ZC0A/67o6-apnAks.jpg&quot;
+    /&gt;
+  &lt;/Avatar.Container&gt;
+);</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Text</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Text = () =&gt; (
+  &lt;Avatar.Container size={64} form=&quot;circle&quot;&gt;
+    &lt;Avatar.Text gradient=&quot;blue&quot;&gt;AB&lt;/Avatar.Text&gt;
+  &lt;/Avatar.Container&gt;
+);</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Icon</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Icon = () =&gt; (
+  &lt;Avatar.Container size={56} form=&quot;squircle&quot;&gt;
+    &lt;Avatar.Icon&gt;
+      &lt;Icon16SearchOutline /&gt;
+    &lt;/Avatar.Icon&gt;
+  &lt;/Avatar.Container&gt;
+);</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Overlay + Close</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const OverlayAndClose = () =&gt; (
+  &lt;Avatar.Container
+    size={64}
+    form=&quot;circle&quot;
+    overlay={&lt;Avatar.Overlay /&gt;}
+    rightBottomCorner={&lt;Avatar.CloseButton aria-label=&quot;Remove&quot; /&gt;}
+  &gt;
+    &lt;Avatar.Text gradient=&quot;purple&quot;&gt;MC&lt;/Avatar.Text&gt;
+  &lt;/Avatar.Container&gt;
+);</code></pre>
+              
+            </div>
+        </div>
+    
+    
+  </div>
+</article>
+<article
+  id="max-ui-button"
+  class="card 
+  has-error
+  has-info
+  no-story-error
+  no-story-warning
+  
+  no-doc-error"
+  role="listitem"
+  aria-label="Button">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> Button</h2>
+      <div class="badges">
+        <label for="c-1-max-ui-button-err" class="badge err as-toggle">API error</label>
+        <label for="c-1-max-ui-button-info" class="badge info as-toggle">1 info</label>
+        <label for="c-1-max-ui-button-stories" class="badge ok as-toggle">3 stories</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/max-ui/Button.stories.tsx">max-ui-button · ./src/stories/max-ui/Button.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-1-max-ui-button-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-1-max-ui-button-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-1-max-ui-button-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">API error</div>
+      <div class="note-body"><pre><code>File: /Users/splee/Documents/code/max-ui-boilerplate/node_modules/@maxhub/max-ui/dist/index.js
+Error:
+Component files in node_modules are not supported.
+The distributed files in node_modules usually don&#39;t contain the necessary comments or types needed to analyze component information.
+Configure TypeScript path aliases to map your package name to the source file instead.
+
+Example (tsconfig.json):
+{
+  &quot;compilerOptions&quot;: {
+    &quot;baseUrl&quot;: &quot;.&quot;,
+    &quot;paths&quot;: {
+      &quot;@design-system/button&quot;: [&quot;src/components/Button.tsx&quot;],
+      &quot;@design-system/*&quot;: [&quot;src/components/*&quot;]
+    }
+  }
+}
+
+Then import using:
+import { Button } from &#39;@design-system/button&#39;
+
+Storybook resolves tsconfig paths automatically.
+Code:
+/* File in node_modules */</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Button, Flex, Icon16SearchOutline } from '@maxhub/max-ui';</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Sizes</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Sizes = () =&gt; (
+  &lt;Flex gap={8} wrap=&quot;wrap&quot;&gt;
+    {([&quot;xsmall&quot;, &quot;small&quot;, &quot;medium&quot;, &quot;large&quot;] as const).map(size =&gt; (
+      &lt;Button key={size} size={size} variant=&quot;primary&quot;&gt;
+        {size}
+      &lt;/Button&gt;
+    ))}
+  &lt;/Flex&gt;
+);</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Variants</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Variants = () =&gt; (
+  &lt;Flex gap={8} wrap=&quot;wrap&quot;&gt;
+    {(
+      [
+        &quot;primary&quot;,
+        &quot;secondary&quot;,
+        &quot;ghost&quot;,
+        &quot;primary-contrast&quot;,
+        &quot;secondary-contrast&quot;,
+        &quot;overlay&quot;,
+        &quot;destructive&quot;,
+      ] as const
+    ).map(variant =&gt; (
+      &lt;Button key={variant} size=&quot;small&quot; variant={variant}&gt;
+        {variant}
+      &lt;/Button&gt;
+    ))}
+  &lt;/Flex&gt;
+);</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Loading</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Loading = () =&gt; (
+  &lt;Button
+    loading
+    size=&quot;medium&quot;
+    variant=&quot;primary&quot;
+    iconBefore={&lt;Icon16SearchOutline /&gt;}
+  &gt;
+    Loading
+  &lt;/Button&gt;
+);</code></pre>
+              
+            </div>
+        </div>
+    
+    
+  </div>
+</article>
+<article
+  id="max-ui-cells"
+  class="card 
+  has-error
+  has-info
+  no-story-error
+  no-story-warning
+  
+  no-doc-error"
+  role="listitem"
+  aria-label="Cells">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> Cells</h2>
+      <div class="badges">
+        <label for="c-2-max-ui-cells-err" class="badge err as-toggle">API error</label>
+        <label for="c-2-max-ui-cells-info" class="badge info as-toggle">1 info</label>
+        <label for="c-2-max-ui-cells-stories" class="badge ok as-toggle">2 stories</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/max-ui/Cells.stories.tsx">max-ui-cells · ./src/stories/max-ui/Cells.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-2-max-ui-cells-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-2-max-ui-cells-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-2-max-ui-cells-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">API error</div>
+      <div class="note-body"><pre><code>We could not detect the component from your story file. Specify meta.component.
+  12 | } from &quot;@maxhub/max-ui&quot;;
+  13 |
+&gt; 14 | const meta = {
+     | ^
+  15 |   title: &quot;MAX UI/Cells&quot;,
+  16 |   parameters: {
+  17 |     layout: &quot;padded&quot;,
+
+./src/stories/max-ui/Cells.stories.tsx:
+import type { Meta, StoryObj } from &quot;@storybook/nextjs-vite&quot;;
+import {
+  Avatar,
+  CellAction,
+  CellHeader,
+  CellInput,
+  CellList,
+  CellSimple,
+  Counter,
+  Icon16Chevron,
+  Icon16SearchOutline,
+} from &quot;@maxhub/max-ui&quot;;
+
+const meta = {
+  title: &quot;MAX UI/Cells&quot;,
+  parameters: {
+    layout: &quot;padded&quot;,
+  },
+} satisfies Meta;
+
+export default meta;
+
+type Story = StoryObj&lt;typeof meta&gt;;
+
+export const CellListExample: Story = {
+  name: &quot;CellList&quot;,
+  render: () =&gt; (
+    &lt;CellList
+      mode=&quot;island&quot;
+      filled
+      header={&lt;CellHeader titleStyle=&quot;caps&quot;&gt;Список&lt;/CellHeader&gt;}
+    &gt;
+      &lt;CellSimple
+        title=&quot;CellSimple&quot;
+        subtitle=&quot;С подзаголовком&quot;
+        showChevron
+        before={
+          &lt;Avatar.Container size={40} form=&quot;circle&quot;&gt;
+            &lt;Avatar.Text gradient=&quot;green&quot;&gt;UI&lt;/Avatar.Text&gt;
+          &lt;/Avatar.Container&gt;
+        }
+        after={&lt;Counter value={3} variant=&quot;attention&quot; rounded /&gt;}
+      /&gt;
+      &lt;CellAction mode=&quot;themed&quot; showChevron before={&lt;Icon16Chevron /&gt;}&gt;
+        CellAction themed
+      &lt;/CellAction&gt;
+      &lt;CellAction mode=&quot;destructive&quot;&gt;CellAction destructive&lt;/CellAction&gt;
+    &lt;/CellList&gt;
+  ),
+};
+
+export const CellInputExample: Story = {
+  name: &quot;CellInput&quot;,
+  render: () =&gt; (
+    &lt;CellList mode=&quot;island&quot; filled&gt;
+      &lt;CellInput
+        height=&quot;normal&quot;
+        placeholder=&quot;CellInput&quot;
+        before={&lt;Icon16SearchOutline /&gt;}
+      /&gt;
+    &lt;/CellList&gt;
+  ),
+};
+</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import {
+  Avatar,
+  CellAction,
+  CellHeader,
+  CellInput,
+  CellList,
+  CellSimple,
+  Counter,
+  Icon16Chevron,
+  Icon16SearchOutline,
+} from '@maxhub/max-ui';</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">CellList</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const CellListExample = () =&gt; (
+  &lt;CellList
+    mode=&quot;island&quot;
+    filled
+    header={&lt;CellHeader titleStyle=&quot;caps&quot;&gt;Список&lt;/CellHeader&gt;}
+  &gt;
+    &lt;CellSimple
+      title=&quot;CellSimple&quot;
+      subtitle=&quot;С подзаголовком&quot;
+      showChevron
+      before={
+        &lt;Avatar.Container size={40} form=&quot;circle&quot;&gt;
+          &lt;Avatar.Text gradient=&quot;green&quot;&gt;UI&lt;/Avatar.Text&gt;
+        &lt;/Avatar.Container&gt;
+      }
+      after={&lt;Counter value={3} variant=&quot;attention&quot; rounded /&gt;}
+    /&gt;
+    &lt;CellAction mode=&quot;themed&quot; showChevron before={&lt;Icon16Chevron /&gt;}&gt;
+      CellAction themed
+    &lt;/CellAction&gt;
+    &lt;CellAction mode=&quot;destructive&quot;&gt;CellAction destructive&lt;/CellAction&gt;
+  &lt;/CellList&gt;
+);</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">CellInput</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const CellInputExample = () =&gt; (
+  &lt;CellList mode=&quot;island&quot; filled&gt;
+    &lt;CellInput
+      height=&quot;normal&quot;
+      placeholder=&quot;CellInput&quot;
+      before={&lt;Icon16SearchOutline /&gt;}
+    /&gt;
+  &lt;/CellList&gt;
+);</code></pre>
+              
+            </div>
+        </div>
+    
+    
+  </div>
+</article>
+<article
+  id="max-ui-counter"
+  class="card 
+  has-error
+  has-info
+  no-story-error
+  no-story-warning
+  
+  no-doc-error"
+  role="listitem"
+  aria-label="Counter">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> Counter</h2>
+      <div class="badges">
+        <label for="c-3-max-ui-counter-err" class="badge err as-toggle">API error</label>
+        <label for="c-3-max-ui-counter-info" class="badge info as-toggle">1 info</label>
+        <label for="c-3-max-ui-counter-stories" class="badge ok as-toggle">1 story</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/max-ui/Counter.stories.tsx">max-ui-counter · ./src/stories/max-ui/Counter.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-3-max-ui-counter-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-3-max-ui-counter-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-3-max-ui-counter-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">API error</div>
+      <div class="note-body"><pre><code>File: /Users/splee/Documents/code/max-ui-boilerplate/node_modules/@maxhub/max-ui/dist/index.js
+Error:
+Component files in node_modules are not supported.
+The distributed files in node_modules usually don&#39;t contain the necessary comments or types needed to analyze component information.
+Configure TypeScript path aliases to map your package name to the source file instead.
+
+Example (tsconfig.json):
+{
+  &quot;compilerOptions&quot;: {
+    &quot;baseUrl&quot;: &quot;.&quot;,
+    &quot;paths&quot;: {
+      &quot;@design-system/button&quot;: [&quot;src/components/Button.tsx&quot;],
+      &quot;@design-system/*&quot;: [&quot;src/components/*&quot;]
+    }
+  }
+}
+
+Then import using:
+import { Button } from &#39;@design-system/button&#39;
+
+Storybook resolves tsconfig paths automatically.
+Code:
+/* File in node_modules */</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Counter, Flex } from '@maxhub/max-ui';</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Variants</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Variants = () =&gt; (
+  &lt;Flex gap={8} wrap=&quot;wrap&quot;&gt;
+    {(
+      [&quot;primary&quot;, &quot;attention&quot;, &quot;promo&quot;, &quot;default&quot;, &quot;mute&quot;, &quot;menu&quot;] as const
+    ).map(variant =&gt; (
+      &lt;Counter key={variant} value={7} variant={variant} rounded /&gt;
+    ))}
+  &lt;/Flex&gt;
+);</code></pre>
+              
+            </div>
+        </div>
+    
+    
+  </div>
+</article>
+<article
+  id="max-ui-forms"
+  class="card 
+  has-error
+  has-info
+  no-story-error
+  no-story-warning
+  
+  no-doc-error"
+  role="listitem"
+  aria-label="Forms">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> Forms</h2>
+      <div class="badges">
+        <label for="c-4-max-ui-forms-err" class="badge err as-toggle">API error</label>
+        <label for="c-4-max-ui-forms-info" class="badge info as-toggle">1 info</label>
+        <label for="c-4-max-ui-forms-stories" class="badge ok as-toggle">4 stories</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/max-ui/Forms.stories.tsx">max-ui-forms · ./src/stories/max-ui/Forms.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-4-max-ui-forms-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-4-max-ui-forms-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-4-max-ui-forms-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">API error</div>
+      <div class="note-body"><pre><code>We could not detect the component from your story file. Specify meta.component.
+  10 | } from &quot;@maxhub/max-ui&quot;;
+  11 |
+&gt; 12 | const meta = {
+     | ^
+  13 |   title: &quot;MAX UI/Forms&quot;,
+  14 |   parameters: {
+  15 |     layout: &quot;padded&quot;,
+
+./src/stories/max-ui/Forms.stories.tsx:
+import { useState } from &quot;react&quot;;
+
+import type { Meta, StoryObj } from &quot;@storybook/nextjs-vite&quot;;
+import {
+  Flex,
+  Icon16SearchOutline,
+  Input,
+  Switch,
+  Textarea,
+} from &quot;@maxhub/max-ui&quot;;
+
+const meta = {
+  title: &quot;MAX UI/Forms&quot;,
+  parameters: {
+    layout: &quot;padded&quot;,
+  },
+} satisfies Meta;
+
+export default meta;
+
+type Story = StoryObj&lt;typeof meta&gt;;
+
+function InputDemo() {
+  const [value, setValue] = useState(&quot;MAX UI&quot;);
+
+  return (
+    &lt;Input
+      mode=&quot;contrast&quot;
+      value={value}
+      onChange={event =&gt; setValue(event.target.value)}
+      placeholder=&quot;Input&quot;
+      iconBefore={&lt;Icon16SearchOutline /&gt;}
+      withClearButton
+      hint=&quot;Подсказка под полем&quot;
+    /&gt;
+  );
+}
+
+function InputModesDemo() {
+  const [value, setValue] = useState(&quot;MAX UI&quot;);
+
+  return (
+    &lt;Flex direction=&quot;column&quot; gap={12}&gt;
+      &lt;Input
+        mode=&quot;default&quot;
+        value={value}
+        onChange={event =&gt; setValue(event.target.value)}
+        placeholder=&quot;mode=default (на secondary фоне)&quot;
+      /&gt;
+      &lt;Input
+        mode=&quot;contrast&quot;
+        value={value}
+        onChange={event =&gt; setValue(event.target.value)}
+        placeholder=&quot;mode=contrast&quot;
+        iconBefore={&lt;Icon16SearchOutline /&gt;}
+        withClearButton
+      /&gt;
+    &lt;/Flex&gt;
+  );
+}
+
+function SwitchDemo() {
+  const [on, setOn] = useState(true);
+
+  return (
+    &lt;Switch checked={on} onChange={event =&gt; setOn(event.target.checked)} /&gt;
+  );
+}
+
+export const InputStory: Story = {
+  name: &quot;Input&quot;,
+  render: () =&gt; &lt;InputDemo /&gt;,
+};
+
+export const SwitchStory: Story = {
+  name: &quot;Switch&quot;,
+  render: () =&gt; &lt;SwitchDemo /&gt;,
+};
+
+export const TextareaStory: Story = {
+  name: &quot;Textarea&quot;,
+  render: () =&gt; (
+    &lt;Flex direction=&quot;column&quot; gap={12}&gt;
+      &lt;Textarea
+        mode=&quot;primary&quot;
+        placeholder=&quot;mode=primary&quot;
+        defaultValue=&quot;Контрастное поле на secondary фоне&quot;
+        rows={3}
+      /&gt;
+      &lt;Textarea
+        mode=&quot;secondary&quot;
+        placeholder=&quot;mode=secondary&quot;
+        defaultValue=&quot;Сливается с фоном — не использовать на secondary&quot;
+        rows={3}
+      /&gt;
+    &lt;/Flex&gt;
+  ),
+};
+
+export const InputModes: Story = {
+  name: &quot;Input modes&quot;,
+  render: () =&gt; &lt;InputModesDemo /&gt;,
+};
+</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Flex, Icon16SearchOutline, Input, Switch, Textarea } from '@maxhub/max-ui';</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Input</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const InputStory = () =&gt; &lt;InputDemo /&gt;;</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Switch</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const SwitchStory = () =&gt; &lt;SwitchDemo /&gt;;</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Textarea</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const TextareaStory = () =&gt; (
+  &lt;Flex direction=&quot;column&quot; gap={12}&gt;
+    &lt;Textarea
+      mode=&quot;primary&quot;
+      placeholder=&quot;mode=primary&quot;
+      defaultValue=&quot;Контрастное поле на secondary фоне&quot;
+      rows={3}
+    /&gt;
+    &lt;Textarea
+      mode=&quot;secondary&quot;
+      placeholder=&quot;mode=secondary&quot;
+      defaultValue=&quot;Сливается с фоном — не использовать на secondary&quot;
+      rows={3}
+    /&gt;
+  &lt;/Flex&gt;
+);</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Input modes</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const InputModes = () =&gt; &lt;InputModesDemo /&gt;;</code></pre>
+              
+            </div>
+        </div>
+    
+    
+  </div>
+</article>
+<article
+  id="max-ui-helpers"
+  class="card 
+  has-error
+  has-info
+  no-story-error
+  no-story-warning
+  
+  no-doc-error"
+  role="listitem"
+  aria-label="Helpers">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> Helpers</h2>
+      <div class="badges">
+        <label for="c-5-max-ui-helpers-err" class="badge err as-toggle">API error</label>
+        <label for="c-5-max-ui-helpers-info" class="badge info as-toggle">1 info</label>
+        <label for="c-5-max-ui-helpers-stories" class="badge ok as-toggle">1 story</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/max-ui/Helpers.stories.tsx">max-ui-helpers · ./src/stories/max-ui/Helpers.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-5-max-ui-helpers-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-5-max-ui-helpers-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-5-max-ui-helpers-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">API error</div>
+      <div class="note-body"><pre><code>We could not detect the component from your story file. Specify meta.component.
+  2 | import { EllipsisText } from &quot;@maxhub/max-ui&quot;;
+  3 |
+&gt; 4 | const meta = {
+    | ^
+  5 |   title: &quot;MAX UI/Helpers&quot;,
+  6 |   parameters: {
+  7 |     layout: &quot;padded&quot;,
+
+./src/stories/max-ui/Helpers.stories.tsx:
+import type { Meta, StoryObj } from &quot;@storybook/nextjs-vite&quot;;
+import { EllipsisText } from &quot;@maxhub/max-ui&quot;;
+
+const meta = {
+  title: &quot;MAX UI/Helpers&quot;,
+  parameters: {
+    layout: &quot;padded&quot;,
+  },
+} satisfies Meta;
+
+export default meta;
+
+type Story = StoryObj&lt;typeof meta&gt;;
+
+export const EllipsisTextExample: Story = {
+  name: &quot;EllipsisText&quot;,
+  render: () =&gt; (
+    &lt;EllipsisText maxLines={2}&gt;
+      EllipsisText обрезает длинный текст. Lorem ipsum dolor sit amet,
+      consectetur adipiscing elit, sed do eiusmod tempor incididunt.
+    &lt;/EllipsisText&gt;
+  ),
+};
+</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { EllipsisText } from '@maxhub/max-ui';</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">EllipsisText</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const EllipsisTextExample = () =&gt; (
+  &lt;EllipsisText maxLines={2}&gt;
+    EllipsisText обрезает длинный текст. Lorem ipsum dolor sit amet,
+    consectetur adipiscing elit, sed do eiusmod tempor incididunt.
+  &lt;/EllipsisText&gt;
+);</code></pre>
+              
+            </div>
+        </div>
+    
+    
+  </div>
+</article>
+<article
+  id="max-ui-iconbutton"
+  class="card 
+  has-error
+  has-info
+  no-story-error
+  no-story-warning
+  
+  no-doc-error"
+  role="listitem"
+  aria-label="IconButton">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> IconButton</h2>
+      <div class="badges">
+        <label for="c-6-max-ui-iconbutton-err" class="badge err as-toggle">API error</label>
+        <label for="c-6-max-ui-iconbutton-info" class="badge info as-toggle">1 info</label>
+        <label for="c-6-max-ui-iconbutton-stories" class="badge ok as-toggle">2 stories</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/max-ui/IconButton.stories.tsx">max-ui-iconbutton · ./src/stories/max-ui/IconButton.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-6-max-ui-iconbutton-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-6-max-ui-iconbutton-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-6-max-ui-iconbutton-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">API error</div>
+      <div class="note-body"><pre><code>File: /Users/splee/Documents/code/max-ui-boilerplate/node_modules/@maxhub/max-ui/dist/index.js
+Error:
+Component files in node_modules are not supported.
+The distributed files in node_modules usually don&#39;t contain the necessary comments or types needed to analyze component information.
+Configure TypeScript path aliases to map your package name to the source file instead.
+
+Example (tsconfig.json):
+{
+  &quot;compilerOptions&quot;: {
+    &quot;baseUrl&quot;: &quot;.&quot;,
+    &quot;paths&quot;: {
+      &quot;@design-system/button&quot;: [&quot;src/components/Button.tsx&quot;],
+      &quot;@design-system/*&quot;: [&quot;src/components/*&quot;]
+    }
+  }
+}
+
+Then import using:
+import { Button } from &#39;@design-system/button&#39;
+
+Storybook resolves tsconfig paths automatically.
+Code:
+/* File in node_modules */</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Flex, Icon16SearchOutline, Icon20CloseFilled, IconButton } from '@maxhub/max-ui';</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; (
+  &lt;Flex gap={8} wrap=&quot;wrap&quot;&gt;
+    {([&quot;xsmall&quot;, &quot;small&quot;, &quot;medium&quot;, &quot;large&quot;] as const).map(size =&gt; (
+      &lt;IconButton key={size} size={size} variant=&quot;secondary&quot;&gt;
+        &lt;Icon16SearchOutline /&gt;
+      &lt;/IconButton&gt;
+    ))}
+  &lt;/Flex&gt;
+);</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Loading</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Loading = () =&gt; (
+  &lt;IconButton size=&quot;medium&quot; variant=&quot;primary&quot; loading&gt;
+    &lt;Icon20CloseFilled /&gt;
+  &lt;/IconButton&gt;
+);</code></pre>
+              
+            </div>
+        </div>
+    
+    
+  </div>
+</article>
+<article
+  id="max-ui-icons"
+  class="card 
+  has-error
+  has-info
+  no-story-error
+  no-story-warning
+  
+  no-doc-error"
+  role="listitem"
+  aria-label="Icons">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> Icons</h2>
+      <div class="badges">
+        <label for="c-7-max-ui-icons-err" class="badge err as-toggle">API error</label>
+        <label for="c-7-max-ui-icons-info" class="badge info as-toggle">1 info</label>
+        <label for="c-7-max-ui-icons-stories" class="badge ok as-toggle">1 story</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/max-ui/Icons.stories.tsx">max-ui-icons · ./src/stories/max-ui/Icons.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-7-max-ui-icons-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-7-max-ui-icons-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-7-max-ui-icons-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">API error</div>
+      <div class="note-body"><pre><code>We could not detect the component from your story file. Specify meta.component.
+   7 | } from &quot;@maxhub/max-ui&quot;;
+   8 |
+&gt;  9 | const meta = {
+     | ^
+  10 |   title: &quot;MAX UI/Icons&quot;,
+  11 |   parameters: {
+  12 |     layout: &quot;padded&quot;,
+
+./src/stories/max-ui/Icons.stories.tsx:
+import type { Meta, StoryObj } from &quot;@storybook/nextjs-vite&quot;;
+import {
+  Flex,
+  Icon16Chevron,
+  Icon16SearchOutline,
+  Icon20CloseFilled,
+} from &quot;@maxhub/max-ui&quot;;
+
+const meta = {
+  title: &quot;MAX UI/Icons&quot;,
+  parameters: {
+    layout: &quot;padded&quot;,
+  },
+} satisfies Meta;
+
+export default meta;
+
+type Story = StoryObj&lt;typeof meta&gt;;
+
+export const IconSet: Story = {
+  name: &quot;Icon set&quot;,
+  render: () =&gt; (
+    &lt;Flex gap={12} align=&quot;center&quot;&gt;
+      &lt;Icon16Chevron /&gt;
+      &lt;Icon16SearchOutline /&gt;
+      &lt;Icon20CloseFilled /&gt;
+    &lt;/Flex&gt;
+  ),
+};
+</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Flex, Icon16Chevron, Icon16SearchOutline, Icon20CloseFilled } from '@maxhub/max-ui';</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Icon set</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const IconSet = () =&gt; (
+  &lt;Flex gap={12} align=&quot;center&quot;&gt;
+    &lt;Icon16Chevron /&gt;
+    &lt;Icon16SearchOutline /&gt;
+    &lt;Icon20CloseFilled /&gt;
+  &lt;/Flex&gt;
+);</code></pre>
+              
+            </div>
+        </div>
+    
+    
+  </div>
+</article>
+<article
+  id="max-ui-layout"
+  class="card 
+  has-error
+  has-info
+  no-story-error
+  no-story-warning
+  
+  no-doc-error"
+  role="listitem"
+  aria-label="Layout">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> Layout</h2>
+      <div class="badges">
+        <label for="c-8-max-ui-layout-err" class="badge err as-toggle">API error</label>
+        <label for="c-8-max-ui-layout-info" class="badge info as-toggle">1 info</label>
+        <label for="c-8-max-ui-layout-stories" class="badge ok as-toggle">1 story</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/max-ui/Layout.stories.tsx">max-ui-layout · ./src/stories/max-ui/Layout.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-8-max-ui-layout-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-8-max-ui-layout-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-8-max-ui-layout-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">API error</div>
+      <div class="note-body"><pre><code>We could not detect the component from your story file. Specify meta.component.
+  2 | import { Container, Grid, Panel } from &quot;@maxhub/max-ui&quot;;
+  3 |
+&gt; 4 | const meta = {
+    | ^
+  5 |   title: &quot;MAX UI/Layout&quot;,
+  6 |   parameters: {
+  7 |     layout: &quot;padded&quot;,
+
+./src/stories/max-ui/Layout.stories.tsx:
+import type { Meta, StoryObj } from &quot;@storybook/nextjs-vite&quot;;
+import { Container, Grid, Panel } from &quot;@maxhub/max-ui&quot;;
+
+const meta = {
+  title: &quot;MAX UI/Layout&quot;,
+  parameters: {
+    layout: &quot;padded&quot;,
+  },
+} satisfies Meta;
+
+export default meta;
+
+type Story = StoryObj&lt;typeof meta&gt;;
+
+export const GridPanelContainer: Story = {
+  name: &quot;Grid · Panel · Container&quot;,
+  render: () =&gt; (
+    &lt;Panel mode=&quot;secondary&quot; className=&quot;rounded-8 p-12&quot;&gt;
+      &lt;Grid cols={2} gap={8}&gt;
+        &lt;Panel mode=&quot;primary&quot; className=&quot;rounded-8 p-12&quot;&gt;
+          Grid 1
+        &lt;/Panel&gt;
+        &lt;Panel mode=&quot;primary&quot; className=&quot;rounded-8 p-12&quot;&gt;
+          Grid 2
+        &lt;/Panel&gt;
+      &lt;/Grid&gt;
+      &lt;Container fullWidth className=&quot;mt-8 p-8&quot;&gt;
+        Container
+      &lt;/Container&gt;
+    &lt;/Panel&gt;
+  ),
+};
+</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Container, Grid, Panel } from '@maxhub/max-ui';</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Grid · Panel · Container</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const GridPanelContainer = () =&gt; (
+  &lt;Panel mode=&quot;secondary&quot; className=&quot;rounded-8 p-12&quot;&gt;
+    &lt;Grid cols={2} gap={8}&gt;
+      &lt;Panel mode=&quot;primary&quot; className=&quot;rounded-8 p-12&quot;&gt;
+        Grid 1
+      &lt;/Panel&gt;
+      &lt;Panel mode=&quot;primary&quot; className=&quot;rounded-8 p-12&quot;&gt;
+        Grid 2
+      &lt;/Panel&gt;
+    &lt;/Grid&gt;
+    &lt;Container fullWidth className=&quot;mt-8 p-8&quot;&gt;
+      Container
+    &lt;/Container&gt;
+  &lt;/Panel&gt;
+);</code></pre>
+              
+            </div>
+        </div>
+    
+    
+  </div>
+</article>
+<article
+  id="max-ui-spinner"
+  class="card 
+  has-error
+  has-info
+  no-story-error
+  no-story-warning
+  
+  no-doc-error"
+  role="listitem"
+  aria-label="Spinner">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> Spinner</h2>
+      <div class="badges">
+        <label for="c-9-max-ui-spinner-err" class="badge err as-toggle">API error</label>
+        <label for="c-9-max-ui-spinner-info" class="badge info as-toggle">1 info</label>
+        <label for="c-9-max-ui-spinner-stories" class="badge ok as-toggle">1 story</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/max-ui/Spinner.stories.tsx">max-ui-spinner · ./src/stories/max-ui/Spinner.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-9-max-ui-spinner-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-9-max-ui-spinner-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-9-max-ui-spinner-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">API error</div>
+      <div class="note-body"><pre><code>File: /Users/splee/Documents/code/max-ui-boilerplate/node_modules/@maxhub/max-ui/dist/index.js
+Error:
+Component files in node_modules are not supported.
+The distributed files in node_modules usually don&#39;t contain the necessary comments or types needed to analyze component information.
+Configure TypeScript path aliases to map your package name to the source file instead.
+
+Example (tsconfig.json):
+{
+  &quot;compilerOptions&quot;: {
+    &quot;baseUrl&quot;: &quot;.&quot;,
+    &quot;paths&quot;: {
+      &quot;@design-system/button&quot;: [&quot;src/components/Button.tsx&quot;],
+      &quot;@design-system/*&quot;: [&quot;src/components/*&quot;]
+    }
+  }
+}
+
+Then import using:
+import { Button } from &#39;@design-system/button&#39;
+
+Storybook resolves tsconfig paths automatically.
+Code:
+/* File in node_modules */</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Flex, Spinner } from '@maxhub/max-ui';</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Appearances</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Appearances = () =&gt; (
+  &lt;Flex gap={16} align=&quot;center&quot; wrap=&quot;wrap&quot;&gt;
+    &lt;Spinner size={20} appearance=&quot;primary&quot; /&gt;
+    &lt;Spinner size={24} appearance=&quot;themed&quot; /&gt;
+    &lt;Spinner size={24} appearance=&quot;contrast&quot; /&gt;
+    &lt;Spinner size={24} appearance=&quot;negative&quot; /&gt;
+  &lt;/Flex&gt;
+);</code></pre>
+              
+            </div>
+        </div>
+    
+    
+  </div>
+</article>
+<article
+  id="max-ui-typography"
+  class="card 
+  has-error
+  has-info
+  no-story-error
+  no-story-warning
+  
+  no-doc-error"
+  role="listitem"
+  aria-label="Typography">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> Typography</h2>
+      <div class="badges">
+        <label for="c-10-max-ui-typography-err" class="badge err as-toggle">API error</label>
+        <label for="c-10-max-ui-typography-info" class="badge info as-toggle">1 info</label>
+        <label for="c-10-max-ui-typography-stories" class="badge ok as-toggle">5 stories</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/max-ui/Typography.stories.tsx">max-ui-typography · ./src/stories/max-ui/Typography.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-10-max-ui-typography-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-10-max-ui-typography-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-10-max-ui-typography-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">API error</div>
+      <div class="note-body"><pre><code>File: /Users/splee/Documents/code/max-ui-boilerplate/node_modules/@maxhub/max-ui/dist/index.js
+Error:
+Component files in node_modules are not supported.
+The distributed files in node_modules usually don&#39;t contain the necessary comments or types needed to analyze component information.
+Configure TypeScript path aliases to map your package name to the source file instead.
+
+Example (tsconfig.json):
+{
+  &quot;compilerOptions&quot;: {
+    &quot;baseUrl&quot;: &quot;.&quot;,
+    &quot;paths&quot;: {
+      &quot;@design-system/button&quot;: [&quot;src/components/Button.tsx&quot;],
+      &quot;@design-system/*&quot;: [&quot;src/components/*&quot;]
+    }
+  }
+}
+
+Then import using:
+import { Button } from &#39;@design-system/button&#39;
+
+Storybook resolves tsconfig paths automatically.
+Code:
+/* File in node_modules */</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Flex, Typography } from '@maxhub/max-ui';</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Display</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Display = () =&gt; &lt;Typography.Display&gt;Display&lt;/Typography.Display&gt;;</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Headline</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Headline = () =&gt; (
+  &lt;Flex direction=&quot;column&quot; gap={8}&gt;
+    &lt;Typography.Headline variant=&quot;large-strong&quot;&gt;
+      Headline large-strong
+    &lt;/Typography.Headline&gt;
+    &lt;Typography.Headline variant=&quot;medium&quot;&gt;Headline medium&lt;/Typography.Headline&gt;
+  &lt;/Flex&gt;
+);</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Title</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Title = () =&gt; (
+  &lt;Flex direction=&quot;column&quot; gap={8}&gt;
+    &lt;Typography.Title variant=&quot;large-strong&quot;&gt;Title large-strong&lt;/Typography.Title&gt;
+    &lt;Typography.Title variant=&quot;medium&quot;&gt;Title medium&lt;/Typography.Title&gt;
+  &lt;/Flex&gt;
+);</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Body</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Body = () =&gt; (
+  &lt;Flex direction=&quot;column&quot; gap={8}&gt;
+    &lt;Typography.Body variant=&quot;large&quot;&gt;Body large&lt;/Typography.Body&gt;
+    &lt;Typography.Body variant=&quot;medium&quot;&gt;Body medium&lt;/Typography.Body&gt;
+  &lt;/Flex&gt;
+);</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Label · Text · Action</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const LabelTextAction = () =&gt; (
+  &lt;Flex direction=&quot;column&quot; gap={12}&gt;
+    &lt;Typography.Label variant=&quot;large&quot;&gt;Label large&lt;/Typography.Label&gt;
+    &lt;Typography.Text variant=&quot;body&quot; color=&quot;primary&quot;&gt;
+      Text body
+    &lt;/Typography.Text&gt;
+    &lt;Typography.Action variant=&quot;medium&quot;&gt;Action medium&lt;/Typography.Action&gt;
+  &lt;/Flex&gt;
+);</code></pre>
+              
+            </div>
+        </div>
+    
+    
+  </div>
+</article>
+    </div>
+    <div class="error-groups" role="region" aria-label="API error groups">
+        <section class="group">
+          <input id="component-file-in-node-modules-toggle" class="group-tg" type="checkbox" hidden />
+          <label for="component-file-in-node-modules-toggle" class="group-header">
+            <span class="caret">▸</span>
+            <span class="group-title">Component file in node_modules</span>
+            <span class="group-count">6</span>
+          </label>
+          <div class="group-cards">
+<article
+  
+  class="card 
+  has-error
+  has-info
+  no-story-error
+  no-story-warning
+  
+  no-doc-error"
+  role="listitem"
+  aria-label="Avatar">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> Avatar</h2>
+      <div class="badges">
+        <label for="c-error-0-max-ui-avatar-err" class="badge err as-toggle">API error</label>
+        <label for="c-error-0-max-ui-avatar-info" class="badge info as-toggle">1 info</label>
+        <label for="c-error-0-max-ui-avatar-stories" class="badge ok as-toggle">4 stories</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/max-ui/Avatar.stories.tsx">max-ui-avatar · ./src/stories/max-ui/Avatar.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-error-0-max-ui-avatar-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-error-0-max-ui-avatar-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-error-0-max-ui-avatar-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">API error</div>
+      <div class="note-body"><pre><code>File: /Users/splee/Documents/code/max-ui-boilerplate/node_modules/@maxhub/max-ui/dist/index.js
+Error:
+Component files in node_modules are not supported.
+The distributed files in node_modules usually don&#39;t contain the necessary comments or types needed to analyze component information.
+Configure TypeScript path aliases to map your package name to the source file instead.
+
+Example (tsconfig.json):
+{
+  &quot;compilerOptions&quot;: {
+    &quot;baseUrl&quot;: &quot;.&quot;,
+    &quot;paths&quot;: {
+      &quot;@design-system/button&quot;: [&quot;src/components/Button.tsx&quot;],
+      &quot;@design-system/*&quot;: [&quot;src/components/*&quot;]
+    }
+  }
+}
+
+Then import using:
+import { Button } from &#39;@design-system/button&#39;
+
+Storybook resolves tsconfig paths automatically.
+Code:
+/* File in node_modules */</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Avatar, Icon16SearchOutline } from '@maxhub/max-ui';</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Image</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Image = () =&gt; (
+  &lt;Avatar.Container size={72} form=&quot;squircle&quot; onlineStatus&gt;
+    &lt;Avatar.Image
+      alt=&quot;User&quot;
+      src=&quot;https://sun9-21.userapi.com/1N-rJz6-7hoTDW7MhpWe19e_R_TdGV6Wu5ZC0A/67o6-apnAks.jpg&quot;
+    /&gt;
+  &lt;/Avatar.Container&gt;
+);</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Text</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Text = () =&gt; (
+  &lt;Avatar.Container size={64} form=&quot;circle&quot;&gt;
+    &lt;Avatar.Text gradient=&quot;blue&quot;&gt;AB&lt;/Avatar.Text&gt;
+  &lt;/Avatar.Container&gt;
+);</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Icon</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Icon = () =&gt; (
+  &lt;Avatar.Container size={56} form=&quot;squircle&quot;&gt;
+    &lt;Avatar.Icon&gt;
+      &lt;Icon16SearchOutline /&gt;
+    &lt;/Avatar.Icon&gt;
+  &lt;/Avatar.Container&gt;
+);</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Overlay + Close</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const OverlayAndClose = () =&gt; (
+  &lt;Avatar.Container
+    size={64}
+    form=&quot;circle&quot;
+    overlay={&lt;Avatar.Overlay /&gt;}
+    rightBottomCorner={&lt;Avatar.CloseButton aria-label=&quot;Remove&quot; /&gt;}
+  &gt;
+    &lt;Avatar.Text gradient=&quot;purple&quot;&gt;MC&lt;/Avatar.Text&gt;
+  &lt;/Avatar.Container&gt;
+);</code></pre>
+              
+            </div>
+        </div>
+    
+    
+  </div>
+</article>
+<article
+  
+  class="card 
+  has-error
+  has-info
+  no-story-error
+  no-story-warning
+  
+  no-doc-error"
+  role="listitem"
+  aria-label="Button">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> Button</h2>
+      <div class="badges">
+        <label for="c-error-1-max-ui-button-err" class="badge err as-toggle">API error</label>
+        <label for="c-error-1-max-ui-button-info" class="badge info as-toggle">1 info</label>
+        <label for="c-error-1-max-ui-button-stories" class="badge ok as-toggle">3 stories</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/max-ui/Button.stories.tsx">max-ui-button · ./src/stories/max-ui/Button.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-error-1-max-ui-button-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-error-1-max-ui-button-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-error-1-max-ui-button-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">API error</div>
+      <div class="note-body"><pre><code>File: /Users/splee/Documents/code/max-ui-boilerplate/node_modules/@maxhub/max-ui/dist/index.js
+Error:
+Component files in node_modules are not supported.
+The distributed files in node_modules usually don&#39;t contain the necessary comments or types needed to analyze component information.
+Configure TypeScript path aliases to map your package name to the source file instead.
+
+Example (tsconfig.json):
+{
+  &quot;compilerOptions&quot;: {
+    &quot;baseUrl&quot;: &quot;.&quot;,
+    &quot;paths&quot;: {
+      &quot;@design-system/button&quot;: [&quot;src/components/Button.tsx&quot;],
+      &quot;@design-system/*&quot;: [&quot;src/components/*&quot;]
+    }
+  }
+}
+
+Then import using:
+import { Button } from &#39;@design-system/button&#39;
+
+Storybook resolves tsconfig paths automatically.
+Code:
+/* File in node_modules */</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Button, Flex, Icon16SearchOutline } from '@maxhub/max-ui';</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Sizes</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Sizes = () =&gt; (
+  &lt;Flex gap={8} wrap=&quot;wrap&quot;&gt;
+    {([&quot;xsmall&quot;, &quot;small&quot;, &quot;medium&quot;, &quot;large&quot;] as const).map(size =&gt; (
+      &lt;Button key={size} size={size} variant=&quot;primary&quot;&gt;
+        {size}
+      &lt;/Button&gt;
+    ))}
+  &lt;/Flex&gt;
+);</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Variants</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Variants = () =&gt; (
+  &lt;Flex gap={8} wrap=&quot;wrap&quot;&gt;
+    {(
+      [
+        &quot;primary&quot;,
+        &quot;secondary&quot;,
+        &quot;ghost&quot;,
+        &quot;primary-contrast&quot;,
+        &quot;secondary-contrast&quot;,
+        &quot;overlay&quot;,
+        &quot;destructive&quot;,
+      ] as const
+    ).map(variant =&gt; (
+      &lt;Button key={variant} size=&quot;small&quot; variant={variant}&gt;
+        {variant}
+      &lt;/Button&gt;
+    ))}
+  &lt;/Flex&gt;
+);</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Loading</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Loading = () =&gt; (
+  &lt;Button
+    loading
+    size=&quot;medium&quot;
+    variant=&quot;primary&quot;
+    iconBefore={&lt;Icon16SearchOutline /&gt;}
+  &gt;
+    Loading
+  &lt;/Button&gt;
+);</code></pre>
+              
+            </div>
+        </div>
+    
+    
+  </div>
+</article>
+<article
+  
+  class="card 
+  has-error
+  has-info
+  no-story-error
+  no-story-warning
+  
+  no-doc-error"
+  role="listitem"
+  aria-label="Counter">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> Counter</h2>
+      <div class="badges">
+        <label for="c-error-2-max-ui-counter-err" class="badge err as-toggle">API error</label>
+        <label for="c-error-2-max-ui-counter-info" class="badge info as-toggle">1 info</label>
+        <label for="c-error-2-max-ui-counter-stories" class="badge ok as-toggle">1 story</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/max-ui/Counter.stories.tsx">max-ui-counter · ./src/stories/max-ui/Counter.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-error-2-max-ui-counter-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-error-2-max-ui-counter-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-error-2-max-ui-counter-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">API error</div>
+      <div class="note-body"><pre><code>File: /Users/splee/Documents/code/max-ui-boilerplate/node_modules/@maxhub/max-ui/dist/index.js
+Error:
+Component files in node_modules are not supported.
+The distributed files in node_modules usually don&#39;t contain the necessary comments or types needed to analyze component information.
+Configure TypeScript path aliases to map your package name to the source file instead.
+
+Example (tsconfig.json):
+{
+  &quot;compilerOptions&quot;: {
+    &quot;baseUrl&quot;: &quot;.&quot;,
+    &quot;paths&quot;: {
+      &quot;@design-system/button&quot;: [&quot;src/components/Button.tsx&quot;],
+      &quot;@design-system/*&quot;: [&quot;src/components/*&quot;]
+    }
+  }
+}
+
+Then import using:
+import { Button } from &#39;@design-system/button&#39;
+
+Storybook resolves tsconfig paths automatically.
+Code:
+/* File in node_modules */</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Counter, Flex } from '@maxhub/max-ui';</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Variants</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Variants = () =&gt; (
+  &lt;Flex gap={8} wrap=&quot;wrap&quot;&gt;
+    {(
+      [&quot;primary&quot;, &quot;attention&quot;, &quot;promo&quot;, &quot;default&quot;, &quot;mute&quot;, &quot;menu&quot;] as const
+    ).map(variant =&gt; (
+      &lt;Counter key={variant} value={7} variant={variant} rounded /&gt;
+    ))}
+  &lt;/Flex&gt;
+);</code></pre>
+              
+            </div>
+        </div>
+    
+    
+  </div>
+</article>
+<article
+  
+  class="card 
+  has-error
+  has-info
+  no-story-error
+  no-story-warning
+  
+  no-doc-error"
+  role="listitem"
+  aria-label="IconButton">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> IconButton</h2>
+      <div class="badges">
+        <label for="c-error-3-max-ui-iconbutton-err" class="badge err as-toggle">API error</label>
+        <label for="c-error-3-max-ui-iconbutton-info" class="badge info as-toggle">1 info</label>
+        <label for="c-error-3-max-ui-iconbutton-stories" class="badge ok as-toggle">2 stories</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/max-ui/IconButton.stories.tsx">max-ui-iconbutton · ./src/stories/max-ui/IconButton.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-error-3-max-ui-iconbutton-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-error-3-max-ui-iconbutton-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-error-3-max-ui-iconbutton-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">API error</div>
+      <div class="note-body"><pre><code>File: /Users/splee/Documents/code/max-ui-boilerplate/node_modules/@maxhub/max-ui/dist/index.js
+Error:
+Component files in node_modules are not supported.
+The distributed files in node_modules usually don&#39;t contain the necessary comments or types needed to analyze component information.
+Configure TypeScript path aliases to map your package name to the source file instead.
+
+Example (tsconfig.json):
+{
+  &quot;compilerOptions&quot;: {
+    &quot;baseUrl&quot;: &quot;.&quot;,
+    &quot;paths&quot;: {
+      &quot;@design-system/button&quot;: [&quot;src/components/Button.tsx&quot;],
+      &quot;@design-system/*&quot;: [&quot;src/components/*&quot;]
+    }
+  }
+}
+
+Then import using:
+import { Button } from &#39;@design-system/button&#39;
+
+Storybook resolves tsconfig paths automatically.
+Code:
+/* File in node_modules */</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Flex, Icon16SearchOutline, Icon20CloseFilled, IconButton } from '@maxhub/max-ui';</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Default</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Default = () =&gt; (
+  &lt;Flex gap={8} wrap=&quot;wrap&quot;&gt;
+    {([&quot;xsmall&quot;, &quot;small&quot;, &quot;medium&quot;, &quot;large&quot;] as const).map(size =&gt; (
+      &lt;IconButton key={size} size={size} variant=&quot;secondary&quot;&gt;
+        &lt;Icon16SearchOutline /&gt;
+      &lt;/IconButton&gt;
+    ))}
+  &lt;/Flex&gt;
+);</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Loading</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Loading = () =&gt; (
+  &lt;IconButton size=&quot;medium&quot; variant=&quot;primary&quot; loading&gt;
+    &lt;Icon20CloseFilled /&gt;
+  &lt;/IconButton&gt;
+);</code></pre>
+              
+            </div>
+        </div>
+    
+    
+  </div>
+</article>
+<article
+  
+  class="card 
+  has-error
+  has-info
+  no-story-error
+  no-story-warning
+  
+  no-doc-error"
+  role="listitem"
+  aria-label="Spinner">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> Spinner</h2>
+      <div class="badges">
+        <label for="c-error-4-max-ui-spinner-err" class="badge err as-toggle">API error</label>
+        <label for="c-error-4-max-ui-spinner-info" class="badge info as-toggle">1 info</label>
+        <label for="c-error-4-max-ui-spinner-stories" class="badge ok as-toggle">1 story</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/max-ui/Spinner.stories.tsx">max-ui-spinner · ./src/stories/max-ui/Spinner.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-error-4-max-ui-spinner-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-error-4-max-ui-spinner-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-error-4-max-ui-spinner-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">API error</div>
+      <div class="note-body"><pre><code>File: /Users/splee/Documents/code/max-ui-boilerplate/node_modules/@maxhub/max-ui/dist/index.js
+Error:
+Component files in node_modules are not supported.
+The distributed files in node_modules usually don&#39;t contain the necessary comments or types needed to analyze component information.
+Configure TypeScript path aliases to map your package name to the source file instead.
+
+Example (tsconfig.json):
+{
+  &quot;compilerOptions&quot;: {
+    &quot;baseUrl&quot;: &quot;.&quot;,
+    &quot;paths&quot;: {
+      &quot;@design-system/button&quot;: [&quot;src/components/Button.tsx&quot;],
+      &quot;@design-system/*&quot;: [&quot;src/components/*&quot;]
+    }
+  }
+}
+
+Then import using:
+import { Button } from &#39;@design-system/button&#39;
+
+Storybook resolves tsconfig paths automatically.
+Code:
+/* File in node_modules */</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Flex, Spinner } from '@maxhub/max-ui';</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Appearances</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Appearances = () =&gt; (
+  &lt;Flex gap={16} align=&quot;center&quot; wrap=&quot;wrap&quot;&gt;
+    &lt;Spinner size={20} appearance=&quot;primary&quot; /&gt;
+    &lt;Spinner size={24} appearance=&quot;themed&quot; /&gt;
+    &lt;Spinner size={24} appearance=&quot;contrast&quot; /&gt;
+    &lt;Spinner size={24} appearance=&quot;negative&quot; /&gt;
+  &lt;/Flex&gt;
+);</code></pre>
+              
+            </div>
+        </div>
+    
+    
+  </div>
+</article>
+<article
+  
+  class="card 
+  has-error
+  has-info
+  no-story-error
+  no-story-warning
+  
+  no-doc-error"
+  role="listitem"
+  aria-label="Typography">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> Typography</h2>
+      <div class="badges">
+        <label for="c-error-5-max-ui-typography-err" class="badge err as-toggle">API error</label>
+        <label for="c-error-5-max-ui-typography-info" class="badge info as-toggle">1 info</label>
+        <label for="c-error-5-max-ui-typography-stories" class="badge ok as-toggle">5 stories</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/max-ui/Typography.stories.tsx">max-ui-typography · ./src/stories/max-ui/Typography.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-error-5-max-ui-typography-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-error-5-max-ui-typography-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-error-5-max-ui-typography-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">API error</div>
+      <div class="note-body"><pre><code>File: /Users/splee/Documents/code/max-ui-boilerplate/node_modules/@maxhub/max-ui/dist/index.js
+Error:
+Component files in node_modules are not supported.
+The distributed files in node_modules usually don&#39;t contain the necessary comments or types needed to analyze component information.
+Configure TypeScript path aliases to map your package name to the source file instead.
+
+Example (tsconfig.json):
+{
+  &quot;compilerOptions&quot;: {
+    &quot;baseUrl&quot;: &quot;.&quot;,
+    &quot;paths&quot;: {
+      &quot;@design-system/button&quot;: [&quot;src/components/Button.tsx&quot;],
+      &quot;@design-system/*&quot;: [&quot;src/components/*&quot;]
+    }
+  }
+}
+
+Then import using:
+import { Button } from &#39;@design-system/button&#39;
+
+Storybook resolves tsconfig paths automatically.
+Code:
+/* File in node_modules */</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Flex, Typography } from '@maxhub/max-ui';</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Display</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Display = () =&gt; &lt;Typography.Display&gt;Display&lt;/Typography.Display&gt;;</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Headline</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Headline = () =&gt; (
+  &lt;Flex direction=&quot;column&quot; gap={8}&gt;
+    &lt;Typography.Headline variant=&quot;large-strong&quot;&gt;
+      Headline large-strong
+    &lt;/Typography.Headline&gt;
+    &lt;Typography.Headline variant=&quot;medium&quot;&gt;Headline medium&lt;/Typography.Headline&gt;
+  &lt;/Flex&gt;
+);</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Title</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Title = () =&gt; (
+  &lt;Flex direction=&quot;column&quot; gap={8}&gt;
+    &lt;Typography.Title variant=&quot;large-strong&quot;&gt;Title large-strong&lt;/Typography.Title&gt;
+    &lt;Typography.Title variant=&quot;medium&quot;&gt;Title medium&lt;/Typography.Title&gt;
+  &lt;/Flex&gt;
+);</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Body</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const Body = () =&gt; (
+  &lt;Flex direction=&quot;column&quot; gap={8}&gt;
+    &lt;Typography.Body variant=&quot;large&quot;&gt;Body large&lt;/Typography.Body&gt;
+    &lt;Typography.Body variant=&quot;medium&quot;&gt;Body medium&lt;/Typography.Body&gt;
+  &lt;/Flex&gt;
+);</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Label · Text · Action</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const LabelTextAction = () =&gt; (
+  &lt;Flex direction=&quot;column&quot; gap={12}&gt;
+    &lt;Typography.Label variant=&quot;large&quot;&gt;Label large&lt;/Typography.Label&gt;
+    &lt;Typography.Text variant=&quot;body&quot; color=&quot;primary&quot;&gt;
+      Text body
+    &lt;/Typography.Text&gt;
+    &lt;Typography.Action variant=&quot;medium&quot;&gt;Action medium&lt;/Typography.Action&gt;
+  &lt;/Flex&gt;
+);</code></pre>
+              
+            </div>
+        </div>
+    
+    
+  </div>
+</article></div>
+        </section>
+      
+        <section class="group">
+          <input id="no-component-found-toggle" class="group-tg" type="checkbox" hidden />
+          <label for="no-component-found-toggle" class="group-header">
+            <span class="caret">▸</span>
+            <span class="group-title">No component found</span>
+            <span class="group-count">5</span>
+          </label>
+          <div class="group-cards">
+<article
+  
+  class="card 
+  has-error
+  has-info
+  no-story-error
+  no-story-warning
+  
+  no-doc-error"
+  role="listitem"
+  aria-label="Cells">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> Cells</h2>
+      <div class="badges">
+        <label for="c-error-0-max-ui-cells-err" class="badge err as-toggle">API error</label>
+        <label for="c-error-0-max-ui-cells-info" class="badge info as-toggle">1 info</label>
+        <label for="c-error-0-max-ui-cells-stories" class="badge ok as-toggle">2 stories</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/max-ui/Cells.stories.tsx">max-ui-cells · ./src/stories/max-ui/Cells.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-error-0-max-ui-cells-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-error-0-max-ui-cells-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-error-0-max-ui-cells-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">API error</div>
+      <div class="note-body"><pre><code>We could not detect the component from your story file. Specify meta.component.
+  12 | } from &quot;@maxhub/max-ui&quot;;
+  13 |
+&gt; 14 | const meta = {
+     | ^
+  15 |   title: &quot;MAX UI/Cells&quot;,
+  16 |   parameters: {
+  17 |     layout: &quot;padded&quot;,
+
+./src/stories/max-ui/Cells.stories.tsx:
+import type { Meta, StoryObj } from &quot;@storybook/nextjs-vite&quot;;
+import {
+  Avatar,
+  CellAction,
+  CellHeader,
+  CellInput,
+  CellList,
+  CellSimple,
+  Counter,
+  Icon16Chevron,
+  Icon16SearchOutline,
+} from &quot;@maxhub/max-ui&quot;;
+
+const meta = {
+  title: &quot;MAX UI/Cells&quot;,
+  parameters: {
+    layout: &quot;padded&quot;,
+  },
+} satisfies Meta;
+
+export default meta;
+
+type Story = StoryObj&lt;typeof meta&gt;;
+
+export const CellListExample: Story = {
+  name: &quot;CellList&quot;,
+  render: () =&gt; (
+    &lt;CellList
+      mode=&quot;island&quot;
+      filled
+      header={&lt;CellHeader titleStyle=&quot;caps&quot;&gt;Список&lt;/CellHeader&gt;}
+    &gt;
+      &lt;CellSimple
+        title=&quot;CellSimple&quot;
+        subtitle=&quot;С подзаголовком&quot;
+        showChevron
+        before={
+          &lt;Avatar.Container size={40} form=&quot;circle&quot;&gt;
+            &lt;Avatar.Text gradient=&quot;green&quot;&gt;UI&lt;/Avatar.Text&gt;
+          &lt;/Avatar.Container&gt;
+        }
+        after={&lt;Counter value={3} variant=&quot;attention&quot; rounded /&gt;}
+      /&gt;
+      &lt;CellAction mode=&quot;themed&quot; showChevron before={&lt;Icon16Chevron /&gt;}&gt;
+        CellAction themed
+      &lt;/CellAction&gt;
+      &lt;CellAction mode=&quot;destructive&quot;&gt;CellAction destructive&lt;/CellAction&gt;
+    &lt;/CellList&gt;
+  ),
+};
+
+export const CellInputExample: Story = {
+  name: &quot;CellInput&quot;,
+  render: () =&gt; (
+    &lt;CellList mode=&quot;island&quot; filled&gt;
+      &lt;CellInput
+        height=&quot;normal&quot;
+        placeholder=&quot;CellInput&quot;
+        before={&lt;Icon16SearchOutline /&gt;}
+      /&gt;
+    &lt;/CellList&gt;
+  ),
+};
+</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import {
+  Avatar,
+  CellAction,
+  CellHeader,
+  CellInput,
+  CellList,
+  CellSimple,
+  Counter,
+  Icon16Chevron,
+  Icon16SearchOutline,
+} from '@maxhub/max-ui';</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">CellList</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const CellListExample = () =&gt; (
+  &lt;CellList
+    mode=&quot;island&quot;
+    filled
+    header={&lt;CellHeader titleStyle=&quot;caps&quot;&gt;Список&lt;/CellHeader&gt;}
+  &gt;
+    &lt;CellSimple
+      title=&quot;CellSimple&quot;
+      subtitle=&quot;С подзаголовком&quot;
+      showChevron
+      before={
+        &lt;Avatar.Container size={40} form=&quot;circle&quot;&gt;
+          &lt;Avatar.Text gradient=&quot;green&quot;&gt;UI&lt;/Avatar.Text&gt;
+        &lt;/Avatar.Container&gt;
+      }
+      after={&lt;Counter value={3} variant=&quot;attention&quot; rounded /&gt;}
+    /&gt;
+    &lt;CellAction mode=&quot;themed&quot; showChevron before={&lt;Icon16Chevron /&gt;}&gt;
+      CellAction themed
+    &lt;/CellAction&gt;
+    &lt;CellAction mode=&quot;destructive&quot;&gt;CellAction destructive&lt;/CellAction&gt;
+  &lt;/CellList&gt;
+);</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">CellInput</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const CellInputExample = () =&gt; (
+  &lt;CellList mode=&quot;island&quot; filled&gt;
+    &lt;CellInput
+      height=&quot;normal&quot;
+      placeholder=&quot;CellInput&quot;
+      before={&lt;Icon16SearchOutline /&gt;}
+    /&gt;
+  &lt;/CellList&gt;
+);</code></pre>
+              
+            </div>
+        </div>
+    
+    
+  </div>
+</article>
+<article
+  
+  class="card 
+  has-error
+  has-info
+  no-story-error
+  no-story-warning
+  
+  no-doc-error"
+  role="listitem"
+  aria-label="Forms">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> Forms</h2>
+      <div class="badges">
+        <label for="c-error-1-max-ui-forms-err" class="badge err as-toggle">API error</label>
+        <label for="c-error-1-max-ui-forms-info" class="badge info as-toggle">1 info</label>
+        <label for="c-error-1-max-ui-forms-stories" class="badge ok as-toggle">4 stories</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/max-ui/Forms.stories.tsx">max-ui-forms · ./src/stories/max-ui/Forms.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-error-1-max-ui-forms-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-error-1-max-ui-forms-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-error-1-max-ui-forms-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">API error</div>
+      <div class="note-body"><pre><code>We could not detect the component from your story file. Specify meta.component.
+  10 | } from &quot;@maxhub/max-ui&quot;;
+  11 |
+&gt; 12 | const meta = {
+     | ^
+  13 |   title: &quot;MAX UI/Forms&quot;,
+  14 |   parameters: {
+  15 |     layout: &quot;padded&quot;,
+
+./src/stories/max-ui/Forms.stories.tsx:
+import { useState } from &quot;react&quot;;
+
+import type { Meta, StoryObj } from &quot;@storybook/nextjs-vite&quot;;
+import {
+  Flex,
+  Icon16SearchOutline,
+  Input,
+  Switch,
+  Textarea,
+} from &quot;@maxhub/max-ui&quot;;
+
+const meta = {
+  title: &quot;MAX UI/Forms&quot;,
+  parameters: {
+    layout: &quot;padded&quot;,
+  },
+} satisfies Meta;
+
+export default meta;
+
+type Story = StoryObj&lt;typeof meta&gt;;
+
+function InputDemo() {
+  const [value, setValue] = useState(&quot;MAX UI&quot;);
+
+  return (
+    &lt;Input
+      mode=&quot;contrast&quot;
+      value={value}
+      onChange={event =&gt; setValue(event.target.value)}
+      placeholder=&quot;Input&quot;
+      iconBefore={&lt;Icon16SearchOutline /&gt;}
+      withClearButton
+      hint=&quot;Подсказка под полем&quot;
+    /&gt;
+  );
+}
+
+function InputModesDemo() {
+  const [value, setValue] = useState(&quot;MAX UI&quot;);
+
+  return (
+    &lt;Flex direction=&quot;column&quot; gap={12}&gt;
+      &lt;Input
+        mode=&quot;default&quot;
+        value={value}
+        onChange={event =&gt; setValue(event.target.value)}
+        placeholder=&quot;mode=default (на secondary фоне)&quot;
+      /&gt;
+      &lt;Input
+        mode=&quot;contrast&quot;
+        value={value}
+        onChange={event =&gt; setValue(event.target.value)}
+        placeholder=&quot;mode=contrast&quot;
+        iconBefore={&lt;Icon16SearchOutline /&gt;}
+        withClearButton
+      /&gt;
+    &lt;/Flex&gt;
+  );
+}
+
+function SwitchDemo() {
+  const [on, setOn] = useState(true);
+
+  return (
+    &lt;Switch checked={on} onChange={event =&gt; setOn(event.target.checked)} /&gt;
+  );
+}
+
+export const InputStory: Story = {
+  name: &quot;Input&quot;,
+  render: () =&gt; &lt;InputDemo /&gt;,
+};
+
+export const SwitchStory: Story = {
+  name: &quot;Switch&quot;,
+  render: () =&gt; &lt;SwitchDemo /&gt;,
+};
+
+export const TextareaStory: Story = {
+  name: &quot;Textarea&quot;,
+  render: () =&gt; (
+    &lt;Flex direction=&quot;column&quot; gap={12}&gt;
+      &lt;Textarea
+        mode=&quot;primary&quot;
+        placeholder=&quot;mode=primary&quot;
+        defaultValue=&quot;Контрастное поле на secondary фоне&quot;
+        rows={3}
+      /&gt;
+      &lt;Textarea
+        mode=&quot;secondary&quot;
+        placeholder=&quot;mode=secondary&quot;
+        defaultValue=&quot;Сливается с фоном — не использовать на secondary&quot;
+        rows={3}
+      /&gt;
+    &lt;/Flex&gt;
+  ),
+};
+
+export const InputModes: Story = {
+  name: &quot;Input modes&quot;,
+  render: () =&gt; &lt;InputModesDemo /&gt;,
+};
+</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Flex, Icon16SearchOutline, Input, Switch, Textarea } from '@maxhub/max-ui';</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Input</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const InputStory = () =&gt; &lt;InputDemo /&gt;;</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Switch</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const SwitchStory = () =&gt; &lt;SwitchDemo /&gt;;</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Textarea</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const TextareaStory = () =&gt; (
+  &lt;Flex direction=&quot;column&quot; gap={12}&gt;
+    &lt;Textarea
+      mode=&quot;primary&quot;
+      placeholder=&quot;mode=primary&quot;
+      defaultValue=&quot;Контрастное поле на secondary фоне&quot;
+      rows={3}
+    /&gt;
+    &lt;Textarea
+      mode=&quot;secondary&quot;
+      placeholder=&quot;mode=secondary&quot;
+      defaultValue=&quot;Сливается с фоном — не использовать на secondary&quot;
+      rows={3}
+    /&gt;
+  &lt;/Flex&gt;
+);</code></pre>
+              
+            </div>
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Input modes</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const InputModes = () =&gt; &lt;InputModesDemo /&gt;;</code></pre>
+              
+            </div>
+        </div>
+    
+    
+  </div>
+</article>
+<article
+  
+  class="card 
+  has-error
+  has-info
+  no-story-error
+  no-story-warning
+  
+  no-doc-error"
+  role="listitem"
+  aria-label="Helpers">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> Helpers</h2>
+      <div class="badges">
+        <label for="c-error-2-max-ui-helpers-err" class="badge err as-toggle">API error</label>
+        <label for="c-error-2-max-ui-helpers-info" class="badge info as-toggle">1 info</label>
+        <label for="c-error-2-max-ui-helpers-stories" class="badge ok as-toggle">1 story</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/max-ui/Helpers.stories.tsx">max-ui-helpers · ./src/stories/max-ui/Helpers.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-error-2-max-ui-helpers-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-error-2-max-ui-helpers-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-error-2-max-ui-helpers-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">API error</div>
+      <div class="note-body"><pre><code>We could not detect the component from your story file. Specify meta.component.
+  2 | import { EllipsisText } from &quot;@maxhub/max-ui&quot;;
+  3 |
+&gt; 4 | const meta = {
+    | ^
+  5 |   title: &quot;MAX UI/Helpers&quot;,
+  6 |   parameters: {
+  7 |     layout: &quot;padded&quot;,
+
+./src/stories/max-ui/Helpers.stories.tsx:
+import type { Meta, StoryObj } from &quot;@storybook/nextjs-vite&quot;;
+import { EllipsisText } from &quot;@maxhub/max-ui&quot;;
+
+const meta = {
+  title: &quot;MAX UI/Helpers&quot;,
+  parameters: {
+    layout: &quot;padded&quot;,
+  },
+} satisfies Meta;
+
+export default meta;
+
+type Story = StoryObj&lt;typeof meta&gt;;
+
+export const EllipsisTextExample: Story = {
+  name: &quot;EllipsisText&quot;,
+  render: () =&gt; (
+    &lt;EllipsisText maxLines={2}&gt;
+      EllipsisText обрезает длинный текст. Lorem ipsum dolor sit amet,
+      consectetur adipiscing elit, sed do eiusmod tempor incididunt.
+    &lt;/EllipsisText&gt;
+  ),
+};
+</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { EllipsisText } from '@maxhub/max-ui';</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">EllipsisText</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const EllipsisTextExample = () =&gt; (
+  &lt;EllipsisText maxLines={2}&gt;
+    EllipsisText обрезает длинный текст. Lorem ipsum dolor sit amet,
+    consectetur adipiscing elit, sed do eiusmod tempor incididunt.
+  &lt;/EllipsisText&gt;
+);</code></pre>
+              
+            </div>
+        </div>
+    
+    
+  </div>
+</article>
+<article
+  
+  class="card 
+  has-error
+  has-info
+  no-story-error
+  no-story-warning
+  
+  no-doc-error"
+  role="listitem"
+  aria-label="Icons">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> Icons</h2>
+      <div class="badges">
+        <label for="c-error-3-max-ui-icons-err" class="badge err as-toggle">API error</label>
+        <label for="c-error-3-max-ui-icons-info" class="badge info as-toggle">1 info</label>
+        <label for="c-error-3-max-ui-icons-stories" class="badge ok as-toggle">1 story</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/max-ui/Icons.stories.tsx">max-ui-icons · ./src/stories/max-ui/Icons.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-error-3-max-ui-icons-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-error-3-max-ui-icons-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-error-3-max-ui-icons-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">API error</div>
+      <div class="note-body"><pre><code>We could not detect the component from your story file. Specify meta.component.
+   7 | } from &quot;@maxhub/max-ui&quot;;
+   8 |
+&gt;  9 | const meta = {
+     | ^
+  10 |   title: &quot;MAX UI/Icons&quot;,
+  11 |   parameters: {
+  12 |     layout: &quot;padded&quot;,
+
+./src/stories/max-ui/Icons.stories.tsx:
+import type { Meta, StoryObj } from &quot;@storybook/nextjs-vite&quot;;
+import {
+  Flex,
+  Icon16Chevron,
+  Icon16SearchOutline,
+  Icon20CloseFilled,
+} from &quot;@maxhub/max-ui&quot;;
+
+const meta = {
+  title: &quot;MAX UI/Icons&quot;,
+  parameters: {
+    layout: &quot;padded&quot;,
+  },
+} satisfies Meta;
+
+export default meta;
+
+type Story = StoryObj&lt;typeof meta&gt;;
+
+export const IconSet: Story = {
+  name: &quot;Icon set&quot;,
+  render: () =&gt; (
+    &lt;Flex gap={12} align=&quot;center&quot;&gt;
+      &lt;Icon16Chevron /&gt;
+      &lt;Icon16SearchOutline /&gt;
+      &lt;Icon20CloseFilled /&gt;
+    &lt;/Flex&gt;
+  ),
+};
+</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Flex, Icon16Chevron, Icon16SearchOutline, Icon20CloseFilled } from '@maxhub/max-ui';</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Icon set</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const IconSet = () =&gt; (
+  &lt;Flex gap={12} align=&quot;center&quot;&gt;
+    &lt;Icon16Chevron /&gt;
+    &lt;Icon16SearchOutline /&gt;
+    &lt;Icon20CloseFilled /&gt;
+  &lt;/Flex&gt;
+);</code></pre>
+              
+            </div>
+        </div>
+    
+    
+  </div>
+</article>
+<article
+  
+  class="card 
+  has-error
+  has-info
+  no-story-error
+  no-story-warning
+  
+  no-doc-error"
+  role="listitem"
+  aria-label="Layout">
+  <div class="head">
+    <div class="title">
+      <h2><span class="status-dot dot-err"></span> Layout</h2>
+      <div class="badges">
+        <label for="c-error-4-max-ui-layout-err" class="badge err as-toggle">API error</label>
+        <label for="c-error-4-max-ui-layout-info" class="badge info as-toggle">1 info</label>
+        <label for="c-error-4-max-ui-layout-stories" class="badge ok as-toggle">1 story</label>
+        
+        
+      </div>
+    </div>
+    <div class="meta" title="./src/stories/max-ui/Layout.stories.tsx">max-ui-layout · ./src/stories/max-ui/Layout.stories.tsx</div>
+    
+    
+    
+  </div>
+
+  <!-- ⬇️ Hidden toggles must be siblings BEFORE .panels -->
+  <input id="c-error-4-max-ui-layout-err" class="tg tg-err" type="checkbox" hidden />
+  <input id="c-error-4-max-ui-layout-info" class="tg tg-info" type="checkbox" hidden />
+  <input id="c-error-4-max-ui-layout-stories" class="tg tg-stories" type="checkbox" hidden />
+  
+  
+  
+
+  <div class="panels">
+    
+        <div class="panel panel-err">
+          
+    <div class="note err">
+      <div class="note-title">API error</div>
+      <div class="note-body"><pre><code>We could not detect the component from your story file. Specify meta.component.
+  2 | import { Container, Grid, Panel } from &quot;@maxhub/max-ui&quot;;
+  3 |
+&gt; 4 | const meta = {
+    | ^
+  5 |   title: &quot;MAX UI/Layout&quot;,
+  6 |   parameters: {
+  7 |     layout: &quot;padded&quot;,
+
+./src/stories/max-ui/Layout.stories.tsx:
+import type { Meta, StoryObj } from &quot;@storybook/nextjs-vite&quot;;
+import { Container, Grid, Panel } from &quot;@maxhub/max-ui&quot;;
+
+const meta = {
+  title: &quot;MAX UI/Layout&quot;,
+  parameters: {
+    layout: &quot;padded&quot;,
+  },
+} satisfies Meta;
+
+export default meta;
+
+type Story = StoryObj&lt;typeof meta&gt;;
+
+export const GridPanelContainer: Story = {
+  name: &quot;Grid · Panel · Container&quot;,
+  render: () =&gt; (
+    &lt;Panel mode=&quot;secondary&quot; className=&quot;rounded-8 p-12&quot;&gt;
+      &lt;Grid cols={2} gap={8}&gt;
+        &lt;Panel mode=&quot;primary&quot; className=&quot;rounded-8 p-12&quot;&gt;
+          Grid 1
+        &lt;/Panel&gt;
+        &lt;Panel mode=&quot;primary&quot; className=&quot;rounded-8 p-12&quot;&gt;
+          Grid 2
+        &lt;/Panel&gt;
+      &lt;/Grid&gt;
+      &lt;Container fullWidth className=&quot;mt-8 p-8&quot;&gt;
+        Container
+      &lt;/Container&gt;
+    &lt;/Panel&gt;
+  ),
+};
+</code></pre></div>
+    </div>
+        </div>
+    
+        <div class="panel panel-info">
+          
+    <div class="note info">
+      <div class="note-title">Info</div>
+      <div class="note-body">No description found. Write a jsdoc comment such as /** Component description */.</div>
+    </div>
+        </div>
+    
+    
+        <div class="panel panel-stories">
+          
+          
+          
+          <div class="note ok">
+                <div class="row">
+                  <span class="ex-name">Imports</span>
+                </div>
+                <pre><code>import { Container, Grid, Panel } from '@maxhub/max-ui';</code></pre>
+              </div>
+          
+          
+            <div class="note ok">
+              <div class="row">
+                <span class="ex-name">Grid · Panel · Container</span>
+                <span class="badge ok">story ok</span>
+              </div>
+              
+              
+              <pre><code>const GridPanelContainer = () =&gt; (
+  &lt;Panel mode=&quot;secondary&quot; className=&quot;rounded-8 p-12&quot;&gt;
+    &lt;Grid cols={2} gap={8}&gt;
+      &lt;Panel mode=&quot;primary&quot; className=&quot;rounded-8 p-12&quot;&gt;
+        Grid 1
+      &lt;/Panel&gt;
+      &lt;Panel mode=&quot;primary&quot; className=&quot;rounded-8 p-12&quot;&gt;
+        Grid 2
+      &lt;/Panel&gt;
+    &lt;/Grid&gt;
+    &lt;Container fullWidth className=&quot;mt-8 p-8&quot;&gt;
+      Container
+    &lt;/Container&gt;
+  &lt;/Panel&gt;
+);</code></pre>
+              
+            </div>
+        </div>
+    
+    
+  </div>
+</article></div>
+        </section>
+      </div>
+    
+    
+  </div>
+</main>
+</body>
+</html>  

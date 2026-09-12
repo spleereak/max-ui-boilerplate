@@ -1,8 +1,8 @@
 "use client";
 
-import { Button, Flex, Typography } from "@maxhub/max-ui";
+import Link from "next/link";
 
-import { STORYBOOK_URL, isExternalStorybookUrl } from "@/src/config/storybook";
+import { Button, Flex, Typography } from "@maxhub/max-ui";
 
 export default function HomePage() {
   return (
@@ -31,14 +31,7 @@ export default function HomePage() {
 
       <Flex gap={8} className="mt-40">
         <Button asChild size="medium" variant="primary">
-          <a
-            href={STORYBOOK_URL}
-            {...(isExternalStorybookUrl()
-              ? { target: "_blank", rel: "noopener noreferrer" }
-              : {})}
-          >
-            Storybook
-          </a>
+          <Link href="/components">Компоненты</Link>
         </Button>
         <Button asChild size="medium" variant="secondary">
           <a
@@ -53,7 +46,7 @@ export default function HomePage() {
 
       <ul className="mt-64 space-y-12 border-t border-neutral-200 pt-32 text-sm text-neutral-500">
         <li>FSD — `src/pages`, `src/widgets`, `src/shared`</li>
-        <li>Storybook для всех компонентов MAX UI</li>
+        <li>Каталог компонентов на `/components`, Storybook — `npm run storybook`</li>
         <li>TypeScript · React 19 · Tailwind CSS 4</li>
       </ul>
     </div>

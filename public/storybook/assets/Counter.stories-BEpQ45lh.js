@@ -1,0 +1,5 @@
+import{n as e}from"./rolldown-runtime-CsOFd3vK.js";import{t}from"./jsx-runtime-CadfrxEJ.js";import{C as n,m as r,v as i}from"./iframe-4--iYJOx.js";var a,o,s,c;function l(){return(l=e((()=>{a=t(),i(),o={title:`MAX UI/Counter`,parameters:{layout:`padded`}},s={render:()=>(0,a.jsx)(r,{gap:8,wrap:`wrap`,children:[`primary`,`attention`,`promo`,`default`,`mute`,`menu`].map(e=>(0,a.jsx)(n,{value:7,variant:e,rounded:!0},e))})},c=[`Variants`],s.parameters={...s.parameters,docs:{...s.parameters?.docs,source:{originalSource:`{
+  render: () => <Flex gap={8} wrap="wrap">
+      {(["primary", "attention", "promo", "default", "mute", "menu"] as const).map(variant => <Counter key={variant} value={7} variant={variant} rounded />)}
+    </Flex>
+}`,...s.parameters?.docs?.source}}}})))()}l();export{s as Variants,c as __namedExportsOrder,o as default};

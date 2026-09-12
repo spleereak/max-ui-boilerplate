@@ -1,7 +1,5 @@
 import type { StorybookConfig } from "@storybook/nextjs-vite";
 
-const storybookBasePath = process.env.STORYBOOK_BASE_PATH;
-
 const config: StorybookConfig = {
   stories: ["../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
   addons: [
@@ -13,13 +11,6 @@ const config: StorybookConfig = {
   ],
   framework: "@storybook/nextjs-vite",
   staticDirs: ["../public"],
-  async viteFinal(config, { configType }) {
-    if (configType === "PRODUCTION" && storybookBasePath) {
-      config.base = storybookBasePath;
-    }
-
-    return config;
-  },
 };
 
 export default config;
