@@ -1,36 +1,243 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MAX UI Boilerplate
 
-## Getting Started
+Стартовый шаблон для мини-приложений и веб-проектов на **Next.js**, **Feature-Sliced Design (FSD)** и дизайн-системе [**MAX UI**](https://dev.max.ru/ui).
 
-First, run the development server:
+## Стек
+
+- [Next.js 16](https://nextjs.org/) (App Router)
+- [React 19](https://react.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [@maxhub/max-ui](https://dev.max.ru/ui) — компоненты MAX
+- [Tailwind CSS 4](https://tailwindcss.com/)
+- [shadcn/ui](https://ui.shadcn.com/) — конфиг для будущих компонентов (`components.json`)
+
+## Требования
+
+- **Node.js 18+** (рекомендуется LTS)
+- npm, yarn, pnpm или bun
+
+## Быстрый старт
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Открой [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Команда | Описание |
+|---------|----------|
+| `npm run dev` | Dev-сервер |
+| `npm run build` | Production-сборка |
+| `npm run start` | Запуск собранного приложения |
+| `npm run lint` | ESLint |
+| `npm run format` | Prettier — форматирование |
+| `npm run format:check` | Prettier — проверка без записи |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Структура проекта
 
-## Learn More
+Next.js-маршруты живут в корневой `app/`, бизнес-логика и UI — в `src/` по FSD.
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/                          # Next.js App Router (тонкие обёртки)
+  layout.tsx                  # Root layout, стили, MaxUIProvider
+  (main)/                     # Группа с общим layout (header)
+    layout.tsx
+    page.tsx                  # → src/pages/home
+  components/                 # Storybook-страница компонентов
+    layout.tsx
+    page.tsx                  # → src/pages/components
+  pages/
+    _document.js              # Заглушка для Pages Router (см. ниже)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+src/
+  app/styles/globals.css      # Глобальные стили + Tailwind
+  pages/                      # FSD: страницы (композиция экранов)
+    home/
+    components/
+  widgets/                    # FSD: виджеты (header, footer, …)
+  features/                   # FSD: фичи
+  entities/                   # FSD: сущности
+  shared/                     # FSD: переиспользуемый код
+    providers/MaxUIProvider.tsx
+    lib/utils/cn.ts
+    ui/PageShell/
+    styles/index.css          # Tailwind @theme
+  config/
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+pages/README.md               # Зачем нужна корневая pages/
+```
 
-## Deploy on Vercel
+### FSD + Next.js
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Маршруты **не** содержат бизнес-логику — только re-export из `src/pages`:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```tsx
+// app/(main)/about/page.tsx
+export { AboutPage as default } from "@/src/pages/about";
+```
+
+```tsx
+// src/pages/about/ui/index.tsx
+export default function AboutPage() {
+  return <div>...</div>;
+}
+```
+
+```tsx
+// src/pages/about/index.ts
+export { default as AboutPage } from "./ui";
+```
+
+### Папка `pages/` в корне
+
+Next.js трактует `src/pages/` как **Pages Router**, если в корне нет своей `pages/`. Корневая `pages/` (с `_document.js` и README) снимает конфликт с FSD-слоем `src/pages/`. Подробнее — в [pages/README.md](./pages/README.md).
+
+## MAX UI
+
+### Подключение
+
+Уже настроено в `app/layout.tsx`:
+
+```tsx
+import "@maxhub/max-ui/dist/styles.css";
+import { MaxUIProvider } from "@/src/shared/providers/MaxUIProvider";
+```
+
+Провайдер оборачивает приложение в `<MaxUI>` с `platform="ios"` и `colorScheme="light"`. Для системной тёмной темы измените props в `src/shared/providers/MaxUIProvider.tsx`.
+
+### Использование компонентов
+
+```tsx
+import { Button, Typography, Panel } from "@maxhub/max-ui";
+
+export default function MyPage() {
+  return (
+    <Panel mode="secondary">
+      <Typography.Title>Заголовок</Typography.Title>
+      <Button variant="primary">Действие</Button>
+    </Panel>
+  );
+}
+```
+
+Документация и API: [dev.max.ru/ui](https://dev.max.ru/ui).
+
+### Поля ввода на цветном фоне
+
+На `Panel mode="secondary"` используйте контрастные режимы, иначе фон сливается с полем:
+
+| Компонент | Рекомендуемый mode |
+|-----------|-------------------|
+| `Input` | `contrast` |
+| `Textarea` | `primary` |
+| `CellInput` | внутри `CellList mode="island" filled` |
+
+## Tailwind CSS
+
+### Шкала отступов
+
+В `src/shared/styles/index.css`:
+
+```css
+--spacing: 0.0625rem;
+```
+
+При `html { font-size: 16px }` **число в классе = пиксели**:
+
+```tsx
+<div className="px-24 py-16 gap-12" />
+// padding-x: 24px, padding-y: 16px, gap: 12px
+```
+
+Не используйте стандартные tailwind-размеры «из коробки» (`p-6` = 6px, а не 24px).
+
+### Утилита `cn`
+
+```tsx
+import { cn } from "@/src/shared/lib/utils/cn";
+
+<div className={cn("base-class", condition && "conditional-class")} />
+```
+
+### shadcn/ui
+
+Конфиг в `components.json`. Добавление компонентов:
+
+```bash
+npx shadcn@latest add button
+```
+
+Компоненты попадут в `src/shared/components/ui/`.
+
+## Storybook-страница компонентов
+
+Маршрут **`/components`** — встроенный каталог MAX UI:
+
+- sidebar со списком stories;
+- canvas с preview;
+- панель метаданных.
+
+Новая story — в `src/pages/components/model/stories.tsx`:
+
+```tsx
+{
+  id: "button/my-variant",
+  name: "My variant",
+  render: () => <Button variant="primary">Click</Button>,
+}
+```
+
+UI Storybook: `src/pages/components/ui/` (`StorybookSidebar`, `StorybookCanvas`).
+
+## Добавление страницы
+
+1. Создайте слайс в FSD:
+
+```
+src/pages/profile/
+  index.ts
+  ui/index.tsx
+```
+
+2. Добавьте маршрут:
+
+```
+app/(main)/profile/page.tsx
+```
+
+```tsx
+export { ProfilePage as default } from "@/src/pages/profile";
+```
+
+3. При необходимости добавьте ссылку в `src/widgets/app-header/ui/index.tsx`.
+
+## Слои FSD
+
+| Слой | Назначение | Пример |
+|------|------------|--------|
+| `shared` | UI-kit, utils, API, hooks | `cn`, `PageShell`, `MaxUIProvider` |
+| `entities` | Бизнес-сущности | `user`, `product` |
+| `features` | Пользовательские сценарии | `auth`, `add-to-cart` |
+| `widgets` | Комposite-блоки | `app-header` |
+| `pages` | Страницы приложения | `home`, `components` |
+
+Импорты только **снизу вверх** (pages → widgets → features → entities → shared).
+
+## Алиасы путей
+
+```json
+"@/*": ["./*"]
+```
+
+Примеры:
+
+- `@/src/pages/home`
+- `@/src/widgets/app-header`
+- `@/src/shared/lib/utils/cn`
+
+## Полезные ссылки
+
+- [MAX UI — документация](https://dev.max.ru/ui)
+- [Feature-Sliced Design](https://feature-sliced.design/)
+- [Next.js App Router](https://nextjs.org/docs/app)
